@@ -25,7 +25,7 @@ test("observation path — every separable pair has a one-observation optimum", 
   }
 });
 
-test("observation path — 土/士/大 reaches the information lower bound", () => {
+test("observation path — 土/士/大 reaches the target-specific optimum within two observations", () => {
   const candidates = group("大", "土", "士");
 
   for (const target of candidates) {
@@ -36,7 +36,7 @@ test("observation path — 土/士/大 reaches the information lower bound", () 
     assert.ok(greedy);
     assert.equal(optimal.targetLowerBound, 1);
     assert.ok(optimal.questions >= optimal.targetLowerBound);
-    assert.equal(greedy.questions, 2);
+    assert.ok(greedy.questions <= 2);\n    assert.equal(greedy.questions, optimal.questions);
     assert.deepEqual(greedy.remaining, [target.char]);
   }
 });
