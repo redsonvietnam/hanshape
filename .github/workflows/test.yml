@@ -14,3 +14,6 @@ jobs:
         with:
           node-version: 20
       - run: npm test
+      - run: npm run benchmark:adaptive
+      - run: npm run benchmark:lookahead
+      - run: npm run benchmark:pairs

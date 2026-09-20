@@ -1,9 +1,13 @@
 {
   "name": "hanshape",
-  "version": "0.6.0",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "demo": "node demo/server.js",
+    "benchmark:adaptive": "node scripts/benchmark-adaptive.js",
+    "benchmark:lookahead": "node scripts/benchmark-lookahead.js",
+    "benchmark:pairs": "node scripts/benchmark-pairs.js"
   }
 }
