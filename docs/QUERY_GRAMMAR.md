@@ -127,3 +127,57 @@ The draft textual relation syntax uses the same scope:
 len(L.hUpper,L.hLower)<
 pos(C.dot,C.mainAxis)=R
 ```
+## Unified input compiler
+
+Numeric and semantic relation tokens now compile into the same semantic AST.
+
+Examples:
+
+```text
+35
+```
+
+becomes:
+
+```js
+{
+  form: "SINGLE",
+  strokes: 5
+}
+```
+
+While:
+
+```text
+35 len(C.hUpper,C.hLower)<
+```
+
+becomes:
+
+```js
+{
+  form: "SINGLE",
+  strokes: 5,
+  relations: [{
+    target: "C",
+    type: "relativeLength",
+    a: "hUpper",
+    b: "hLower",
+    value: "shorter"
+  }]
+}
+```
+
+Both are passed to the same deterministic semantic matcher.
+
+Whitespace separates input tokens. This creates a progressive path without committing to a final numeric compression for relations:
+
+```text
+base numeric query
+        +
+semantic relation token
+        ↓
+one semantic query
+        ↓
+matcher
+```
