@@ -25,14 +25,12 @@ const STUDY_CHARACTERS = CHARACTER_MODEL.filter(
 
 let target = null;
 let candidates = [];
-let sessionQuery = null;
 let sessionStartedAt = 0;
 let lastActionAt = 0;
 let timerId = null;
 let completed = false;
 let eventLog = [];
 let actionCount = 0;
-let resetCount = 0;
 
 function now() {
   return performance.now();
@@ -236,15 +234,6 @@ function applyObservedValue(observation, value) {
     value
   );
 
-  sessionQuery = sessionQuery
-    ? {
-        all: [
-          ...(sessionQuery.all || []),
-          observedQuery
-        ]
-      }
-    : observedQuery;
-
   candidates = after;
   actionCount += 1;
 
@@ -283,20 +272,9 @@ function applyObservedValue(observation, value) {
 }
 
 function newTask() {
-  if (target) {
-    resetCount += 1;
-    logEvent({
-      type: "reset",
-      previousTarget: target.char,
-      completed,
-      actions: actionCount
-    });
-  }
-
   const index = Math.floor(Math.random() * STUDY_CHARACTERS.length);
   target = STUDY_CHARACTERS[index];
   candidates = [...STUDY_CHARACTERS];
-  sessionQuery = null;
   sessionStartedAt = now();
   lastActionAt = sessionStartedAt;
   actionCount = 0;
@@ -332,7 +310,6 @@ function exportSession() {
     summary: {
       elapsedMs: Math.round(elapsedMs()),
       actions: actionCount,
-      resets: resetCount,
       completed
     }
   };
