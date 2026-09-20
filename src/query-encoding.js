@@ -6,77 +6,8 @@ const TARGET_DIGIT_BY_ID = {
   B: "2"
 };
 
-const FEATURE_BINDINGS = [
-  {
-    digit: "0",
-    kind: "topology",
-    path: ["enclosure"],
-    value: true
-  },
-  {
-    digit: "1",
-    kind: "geometry",
-    path: ["axis"],
-    value: "vertical"
-  },
-  {
-    digit: "2",
-    kind: "geometry",
-    path: ["axis"],
-    value: "horizontal"
-  },
-  {
-    digit: "3",
-    kind: "topology",
-    path: ["junction"],
-    operator: "gte",
-    value: 1
-  },
-  {
-    digit: "4",
-    kind: "topology",
-    path: ["junction"],
-    operator: "gte",
-    value: 3
-  },
-  {
-    digit: "5",
-    kind: "relations",
-    path: ["parallelism"],
-    value: true
-  },
-  {
-    digit: "6",
-    kind: "strokeTypes",
-    path: ["dot"],
-    value: true
-  },
-  {
-    digit: "7",
-    kind: "geometry",
-    path: ["curvature"],
-    value: "curved"
-  },
-  {
-    digit: "8",
-    kind: "topology",
-    path: ["crossing"],
-    value: true
-  },
-  {
-    digit: "9",
-    kind: "composition",
-    path: ["density"],
-    value: "dense"
-  }
-];
-
 function exactKeys(object) {
   return Object.keys(object).sort();
-}
-
-function equalPrimitiveObject(actual, expected) {
-  return JSON.stringify(actual) === JSON.stringify(expected);
 }
 
 function classifyRegionFeature(expected) {
