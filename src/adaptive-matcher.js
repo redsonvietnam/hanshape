@@ -215,6 +215,7 @@ function collectQuestions(candidates) {
       for (const relation of source.relations || []) {
         const query = {
           relations: [{
+            target,
             type: relation.type,
             a: relation.a,
             b: relation.b,
