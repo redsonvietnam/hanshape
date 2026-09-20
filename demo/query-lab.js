@@ -1,5 +1,6 @@
 import { CHARACTER_MODEL } from "../src/character-model.js";
-import { matchInput, parseInput } from "../src/query.js";
+import { matchInput, parseInput, mergeSemanticQueries } from "../src/query.js";
+import { observationToSemanticQuery } from "../src/observation-query.js";
 import { rankAdaptiveObservations, applyObservationAnswer } from "../src/multivalue-observation.js";
 
 const els = {
@@ -20,6 +21,8 @@ const EXAMPLES = [
 ];
 
 let candidates = CHARACTER_MODEL;
+let baseQuery = null;
+let sessionQuery = null;
 
 function renderCandidates() {
   els.candidates.replaceChildren();
@@ -40,8 +43,15 @@ function observationValueLabel(value) {
 }
 
 function applyObservedValue(observation, value) {
-  candidates = applyObservationAnswer(candidates, observation, value);
-  renderState(null);
+  const observedQuery = observationToSemanticQuery(observation, value);
+  if (!observedQuery) return;
+
+  sessionQuery = mergeSemanticQueries(sessionQuery, observedQuery);
+  const effectiveQuery = mergeSemanticQueries(baseQuery, sessionQuery);
+  candidates = matchInput(CHARACTER_MODEL, effectiveQuery
+    ? JSON.stringify(effectiveQuery)
+    : els.input.value);
+  renderState({ query: effectiveQuery });
 }
 
 function renderGuidance() {
@@ -110,6 +120,8 @@ function renderState(parsed) {
 
 function parseAndReset() {
   const parsed = parseInput(els.input.value);
+  baseQuery = parsed?.query ?? null;
+  sessionQuery = null;
   candidates = parsed ? matchInput(CHARACTER_MODEL, els.input.value) : [];
   renderState(parsed);
 }
