@@ -87,3 +87,53 @@ export function featureTokenFromParts(target, path, operator, value) {
 
   return "feat(" + target + "." + path.join(".") + ")" + symbol + literal;
 }
+
+function nestedHasQuery(target, path, value) {
+  let current = [value];
+  for (let i = path.length - 1; i >= 0; i -= 1) {
+    current = { [path[i]]: current };
+  }
+
+  return {
+    regions: {
+      [target]: current
+    }
+  };
+}
+
+export function parseHasToken(token) {
+  const raw = String(token ?? "").trim();
+  const match = /^has\(([^,]+),([^\)]+)\)(?:=(true|false))?$/.exec(raw);
+  if (!match) return null;
+
+  const ref = parseTargetRef(match[1]);
+  const value = parseLiteral(match[2]);
+  if (!ref || value === null) return null;
+
+  return {
+    kind: "has",
+    raw,
+    target: ref.target,
+    path: ref.path,
+    value,
+    expected: match[3] === undefined ? true : match[3] === "true"
+  };
+}
+
+export function hasTokenToSemanticQuery(token) {
+  const parsed = typeof token === "string"
+    ? parseHasToken(token)
+    : token;
+
+  if (!parsed) return null;
+
+  const positive = nestedHasQuery(parsed.target, parsed.path, parsed.value);
+  return parsed.expected ? positive : { not: positive };
+}
+
+export function hasTokenFromParts(target, path, value, expected = true) {
+  const literal = typeof value === "string" && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(value)
+    ? value
+    : String(value);
+  return "has(" + target + "." + path.join(".") + "," + literal + ")=" + String(expected);
+}
