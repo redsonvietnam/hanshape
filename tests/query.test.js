@@ -77,3 +77,7 @@ test("empty or malformed input returns no candidates", () => {
   assert.deepEqual(matchInput(CHARACTER_MODEL, ""), []);
   assert.deepEqual(matchInput(CHARACTER_MODEL, "not-a-token"), []);
 });
+
+test("numeric parser rejects a region that the selected form does not have", () => {
+  assert.equal(parseInput("3440"), null);
+});
