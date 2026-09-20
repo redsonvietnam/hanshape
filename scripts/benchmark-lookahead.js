@@ -37,7 +37,7 @@ function identify(candidates, target, depth) {
   };
 }
 
-const sizes = [4, 5];
+const sizes = [4];
 const results = [];
 
 for (const size of sizes) {
@@ -107,6 +107,6 @@ for (const size of sizes) {
 }
 
 console.log("");
-console.log("Exhaustive lookahead comparison");
+console.log("Exhaustive lookahead comparison (all 4-character subsets)");
 console.log("==============================");
 console.table(results);
