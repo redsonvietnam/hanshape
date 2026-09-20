@@ -65,3 +65,16 @@ test("multivalue observation answer keeps exact branch semantics", () => {
   assert.ok(branch.some(candidate => candidate.char === target.char));
   assert.equal(branch.length < candidates.length, true);
 });
+
+test("multivalue observations do not invent a region for mixed forms", () => {
+  const candidates = [
+    ...group("明"),
+    ...group("木")
+  ];
+
+  const ranked = rankAdaptiveObservations(candidates, { limit: 50 });
+  assert.equal(
+    ranked.some(item => item.target === "L"),
+    false
+  );
+});
