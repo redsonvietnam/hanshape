@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { CHARACTER_MODEL } from "../src/character-model.js";
-import { matchSemantic } from "../src/matcher.js";
+import { matchSemantic, matchCharacters } from "../src/matcher.js";
 import { parseBase } from "../src/parser.js";
 
 const chars = result => result.map(x => x.char);
@@ -255,4 +255,38 @@ test("semantic query is independent of digit binding", () => {
   });
 
   assert.deepEqual(chars(semantic), ["日"]);
+});
+
+test("numeric parallelism binding reaches semantic matcher", () => {
+  const corpus = [{
+    char: "X",
+    form: "SINGLE",
+    strokes: 4,
+    regions: {
+      C: {
+        strokes: 4,
+        relations: [{ type: "parallelism", value: true }]
+      }
+    }
+  }, {
+    char: "Y",
+    form: "SINGLE",
+    strokes: 4,
+    regions: {
+      C: {
+        strokes: 4,
+        relations: []
+      }
+    }
+  }];
+
+  const parsed = parseBase("34055");
+  assert.ok(parsed);
+  assert.deepEqual(parsed.refinements[0].query, {
+    path: "relations.parallelism",
+    equals: true
+  });
+  
+  const matched = chars(matchCharacters(corpus, parsed));
+  assert.deepEqual(matched, ["X"]);
 });
