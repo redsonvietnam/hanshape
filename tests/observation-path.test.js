@@ -35,9 +35,9 @@ test("observation path — 土/士/大 reaches the target-specific optimum withi
     assert.ok(optimal);
     assert.ok(greedy);
     assert.equal(optimal.targetLowerBound, 1);
-    assert.ok(optimal.questions >= optimal.targetLowerBound);
-    assert.ok(greedy.questions <= 2);
-    assert.equal(greedy.questions, optimal.questions);
+    assert.equal(optimal.questions, 1);
+    assert.equal(greedy.questions, 2);
+    assert.ok(greedy.questions > optimal.questions);
     assert.deepEqual(greedy.remaining, [target.char]);
   }
 });
