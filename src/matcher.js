@@ -9,10 +9,23 @@ function getRegionCounts(char, form) {
 function matchNested(expected, actual) {
   if (expected === undefined) return true;
   if (actual === undefined) return false;
-  if (Array.isArray(expected)) return expected.every(value => actual.includes(value));
-  if (expected && typeof expected === "object") {
-    return Object.entries(expected).every(([key, value]) => matchNested(value, actual?.[key]));
+  if (Array.isArray(expected)) {
+    return expected.every(value => actual?.includes(value));
   }
+
+  if (expected && typeof expected === "object") {
+    if ("gt" in expected) return Number(actual) > expected.gt;
+    if ("gte" in expected) return Number(actual) >= expected.gte;
+    if ("lt" in expected) return Number(actual) < expected.lt;
+    if ("lte" in expected) return Number(actual) <= expected.lte;
+    if ("eq" in expected) return actual === expected.eq;
+    if ("neq" in expected) return actual !== expected.neq;
+
+    return Object.entries(expected).every(([key, value]) =>
+      matchNested(value, actual?.[key])
+    );
+  }
+
   return actual === expected;
 }
 
