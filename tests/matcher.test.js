@@ -290,3 +290,36 @@ test("numeric parallelism binding reaches semantic matcher", () => {
   const matched = chars(matchCharacters(corpus, parsed));
   assert.deepEqual(matched, ["X"]);
 });
+
+test("semantic negative query excludes matching stroke features", () => {
+  const corpus = [{
+    char: "X",
+    form: "SINGLE",
+    strokes: 4,
+    regions: {
+      C: {
+        strokes: 4,
+        strokeTypes: ["dot"]
+      }
+    }
+  }, {
+    char: "Y",
+    form: "SINGLE",
+    strokes: 4,
+    regions: {
+      C: {
+        strokes: 4,
+        strokeTypes: ["horizontal"]
+      }
+    }
+  }];
+
+  assert.deepEqual(
+    chars(matchSemantic(corpus, {
+      not: {
+        regions: { C: { strokeTypes: ["dot"] } }
+      }
+    })),
+    ["Y"]
+  );
+});
