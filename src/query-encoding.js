@@ -137,10 +137,21 @@ export function encodeSemanticQuestion(question) {
       query.relations[0].type === "parallelism" &&
       query.relations[0].value === true
     ) {
+      const target = query.relations[0].target ?? "C";
+      const targetDigit = TARGET_DIGIT_BY_ID[target];
+
+      if (!targetDigit) {
+        return {
+          supported: false,
+          reason: "target-not-bound",
+          target
+        };
+      }
+
       return {
         supported: true,
-        code: "0" + TARGET_DIGIT_BY_ID.C + "5",
-        target: "C",
+        code: "0" + targetDigit + "5",
+        target,
         featureDigit: "5",
         concept: "parallelism"
       };
