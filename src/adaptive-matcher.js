@@ -375,7 +375,7 @@ function bestPlan(candidates, depth, memo, options = {}) {
     };
   }
 
-  const key = `${options.costMode ?? "weighted"}:${depth}: ${candidateKey(candidates)}`;
+  const key = `${options.costMode ?? "flat"}:${depth}: ${candidateKey(candidates)}`;
   if (memo.has(key)) return memo.get(key);
 
   let best = null;
@@ -415,7 +415,7 @@ export function rankAdaptiveQuestions(candidates, options = {}) {
 
   const limit = options.limit ?? 5;
   const lookaheadDepth = normalizeLookaheadDepth(options.lookaheadDepth);
-  const costMode = options.costMode ?? "weighted";
+  const costMode = options.costMode ?? "flat";
   const scoringOptions = { costMode };
   const memo = new Map();
 
