@@ -208,6 +208,8 @@ export function compareObservationPaths(candidates, targetChar, options = {}) {
     costGap: greedy.cost - optimal.cost,
     optimalPath: optimal.path,
     greedyPath: greedy.path,
+    optimalRemaining: optimal.remaining,
+    greedyRemaining: greedy.remaining,
     statesExplored: optimal.statesExplored
   };
 }
