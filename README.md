@@ -16,7 +16,7 @@ A partial query is valid. Collisions are expected. Refinement narrows the candid
 
 - `docs/FEATURE_ONTOLOGY.md` — primitive concepts
 - `docs/QUERY_GRAMMAR.md` — numeric and abstract query grammar
-- `docs/ADAPTIVE_MATCHER.md` — information-gain question selection
+- `docs/ADAPTIVE_MATCHER.md` — information-gain and multi-step question selection
 - `src/concepts.js` — ontology
 - `src/digit-binding.js` — digit/input bindings
 - `src/character-model.js` — semantic morphology corpus
