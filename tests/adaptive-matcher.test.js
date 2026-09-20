@@ -88,7 +88,7 @@ test("adaptive matcher — lookahead depth 2 includes a conditional next questio
   assert.equal(lookahead.lookaheadDepth, 2);
 
   assert.equal(greedy.expectedInformationGain, greedy.informationGain);
-  assert.equal(greedy.expectedCost, greedy.cost);
+  assert.equal(greedy.expectedCost, greedy.recognitionCost);
   assert.equal(greedy.lookaheadScore, greedy.score);
 
   assert.ok(lookahead.expectedInformationGain > lookahead.informationGain);
