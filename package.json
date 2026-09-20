@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "demo": "node demo/server.js"
+    "demo": "node demo/server.js",
+    "benchmark:adaptive": "node scripts/benchmark-adaptive.js"
   }
 }
