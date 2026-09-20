@@ -1,4 +1,3 @@
-import { FEATURE_CONCEPTS } from "./concepts.js";
 import { matchSemantic } from "./matcher.js";
 
 const TARGETS = ["C", "L", "R", "T", "B", "O", "I"];
@@ -101,26 +100,6 @@ function makeQuestion(id, query, label, concept, cost) {
   return { id, query, label, concept, cost };
 }
 
-function addScalarQuestions(list, target, pathBase, values, labelBase, concept, cost) {
-  for (const value of values) {
-    const query = {
-      regions: {
-        [target]: {
-          [pathBase]: value
-        }
-      }
-    };
-
-    list.push(makeQuestion(
-      JSON.stringify(query),
-      query,
-      `${labelBase}: ${VALUE_LABELS[value] ?? value}`,
-      concept,
-      cost
-    ));
-  }
-}
-
 function collectQuestions(candidates) {
   const questions = new Map();
 
@@ -133,7 +112,6 @@ function collectQuestions(candidates) {
       const source = featureSource(candidate, target);
       if (!source) continue;
 
-      // Topology: boolean / enum concepts.
       for (const concept of ["enclosure", "connectivity", "crossing"]) {
         const value = source.topology?.[concept];
         if (value === undefined) continue;
@@ -152,7 +130,6 @@ function collectQuestions(candidates) {
         ));
       }
 
-      // Geometry.
       for (const concept of ["axis", "curvature", "symmetry", "convergence"]) {
         const value = source.geometry?.[concept];
         if (value === undefined || value === "none") continue;
@@ -175,7 +152,6 @@ function collectQuestions(candidates) {
         ));
       }
 
-      // Stroke type presence.
       for (const strokeType of source.strokeTypes || []) {
         const query = {
           regions: {
@@ -194,7 +170,6 @@ function collectQuestions(candidates) {
         ));
       }
 
-      // Boundary contact is a semantic primitive used for enclosed content.
       const boundaryContact = source.content?.boundaryContact;
       if (boundaryContact) {
         const query = {
@@ -214,7 +189,6 @@ function collectQuestions(candidates) {
         ));
       }
 
-      // Junction: generate thresholds only where they can differ.
       const junction = source.topology?.junction;
       if (Number.isFinite(junction)) {
         for (let threshold = 1; threshold <= junction; threshold += 1) {
@@ -238,7 +212,6 @@ function collectQuestions(candidates) {
         }
       }
 
-      // Relations are already semantic and can be queried directly.
       for (const relation of source.relations || []) {
         const query = {
           relations: [{
@@ -282,22 +255,28 @@ function priorityOf(concept) {
   return index === -1 ? 999 : index;
 }
 
+function partitionCandidates(candidates, question) {
+  const yes = matchSemantic(candidates, question.query);
+  const yesSet = new Set(yes.map(candidate => candidate.char));
+  const no = candidates.filter(candidate => !yesSet.has(candidate.char));
+  return { yes, no };
+}
+
+function candidateKey(candidates) {
+  return candidates.map(candidate => candidate.char).sort().join("\u0000");
+}
+
 function scoreQuestion(question, candidates) {
   const n = candidates.length;
   if (n < 2) return null;
 
-  const yes = matchSemantic(candidates, question.query);
-  const yesSet = new Set(yes.map(candidate => candidate.char));
-  const no = candidates.filter(candidate => !yesSet.has(candidate.char));
-
+  const { yes, no } = partitionCandidates(candidates, question);
   if (!yes.length || !no.length) return null;
 
   const yesProbability = yes.length / n;
   const informationGain = entropy(yesProbability);
   const expectedRemaining = Math.max(yes.length, no.length);
   const eliminationRatio = 1 - expectedRemaining / n;
-
-  // Information gain is primary. Cost only breaks ties / near-ties.
   const score = informationGain / question.cost;
 
   return {
@@ -314,23 +293,134 @@ function scoreQuestion(question, candidates) {
   };
 }
 
+function normalizeLookaheadDepth(value) {
+  const depth = Number(value);
+  if (!Number.isFinite(depth)) return 1;
+  return Math.max(1, Math.floor(depth));
+}
+
+function evaluatePlanQuestion(question, candidates, depth, memo) {
+  const immediate = scoreQuestion(question, candidates);
+  if (!immediate) return null;
+
+  if (depth <= 1) {
+    return {
+      ...immediate,
+      lookaheadDepth: 1,
+      expectedInformationGain: immediate.informationGain,
+      expectedCost: question.cost,
+      lookaheadScore: immediate.score
+    };
+  }
+
+  const { yes, no } = partitionCandidates(candidates, question);
+  const yesPlan = bestPlan(yes, depth - 1, memo);
+  const noPlan = bestPlan(no, depth - 1, memo);
+
+  const yesProbability = yes.length / candidates.length;
+  const noProbability = no.length / candidates.length;
+
+  const expectedInformationGain =
+    immediate.informationGain +
+    yesProbability * yesPlan.expectedInformationGain +
+    noProbability * noPlan.expectedInformationGain;
+
+  const expectedCost =
+    question.cost +
+    yesProbability * yesPlan.expectedCost +
+    noProbability * noPlan.expectedCost;
+
+  return {
+    ...immediate,
+    lookaheadDepth: depth,
+    expectedInformationGain,
+    expectedCost,
+    lookaheadScore: expectedInformationGain / expectedCost
+  };
+}
+
+function betterPlan(a, b) {
+  if (!b) return a;
+  if (a.lookaheadScore !== b.lookaheadScore) {
+    return a.lookaheadScore > b.lookaheadScore ? a : b;
+  }
+  if (a.expectedInformationGain !== b.expectedInformationGain) {
+    return a.expectedInformationGain > b.expectedInformationGain ? a : b;
+  }
+  if (a.expectedCost !== b.expectedCost) {
+    return a.expectedCost < b.expectedCost ? a : b;
+  }
+  if (a.informationGain !== b.informationGain) {
+    return a.informationGain > b.informationGain ? a : b;
+  }
+  if (a.cost !== b.cost) {
+    return a.cost < b.cost ? a : b;
+  }
+  return priorityOf(a.concept) - priorityOf(b.concept) <= 0 ? a : b;
+}
+
+function bestPlan(candidates, depth, memo) {
+  if (candidates.length < 2 || depth < 1) {
+    return {
+      question: null,
+      expectedInformationGain: 0,
+      expectedCost: 0,
+      lookaheadScore: 0
+    };
+  }
+
+  const key = `${depth}: ${candidateKey(candidates)}`;
+  if (memo.has(key)) return memo.get(key);
+
+  let best = null;
+  for (const question of collectQuestions(candidates)) {
+    const scored = evaluatePlanQuestion(question, candidates, depth, memo);
+    if (!scored) continue;
+    best = betterPlan(scored, best);
+  }
+
+  const result = best ?? {
+    question: null,
+    expectedInformationGain: 0,
+    expectedCost: 0,
+    lookaheadScore: 0
+  };
+
+  memo.set(key, result);
+  return result;
+}
+
 /**
  * Rank questions that can split the current candidate set.
  *
- * This is a greedy, one-step adaptive strategy:
- * choose the observable predicate with the highest information gain
- * relative to its recognition cost.
+ * With lookaheadDepth=1 this is the original greedy strategy:
+ *
+ *   score = informationGain / recognitionCost
+ *
+ * With lookaheadDepth>1, the score becomes:
+ *
+ *   expectedInformationGain / expectedCost
+ *
+ * where both values include the best conditional questions in the
+ * future branches up to the requested depth.
  */
 export function rankAdaptiveQuestions(candidates, options = {}) {
   if (!Array.isArray(candidates) || candidates.length < 2) return [];
 
   const limit = options.limit ?? 5;
+  const lookaheadDepth = normalizeLookaheadDepth(options.lookaheadDepth);
+  const memo = new Map();
+
   const scored = collectQuestions(candidates)
-    .map(question => scoreQuestion(question, candidates))
+    .map(question =>
+      evaluatePlanQuestion(question, candidates, lookaheadDepth, memo)
+    )
     .filter(Boolean);
 
   return scored.sort((a, b) =>
-    b.score - a.score ||
+    b.lookaheadScore - a.lookaheadScore ||
+    b.expectedInformationGain - a.expectedInformationGain ||
+    a.expectedCost - b.expectedCost ||
     b.informationGain - a.informationGain ||
     a.cost - b.cost ||
     priorityOf(a.concept) - priorityOf(b.concept) ||
