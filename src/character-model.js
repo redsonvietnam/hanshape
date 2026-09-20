@@ -53,8 +53,8 @@ export const CHARACTER_MODEL = [
   {
     char: "朋", pinyin: "péng", form: "LR",
     regions: {
-      L: region({ strokes: 4, topology: { enclosure: true, junction: 2 }, geometry: { axis: "vertical", symmetry: "vertical" }, strokeTypes: ["horizontal", "vertical"] }),
-      R: region({ strokes: 4, topology: { enclosure: true, junction: 2 }, geometry: { axis: "vertical", symmetry: "vertical" }, strokeTypes: ["horizontal", "vertical"] })
+      L: region({ strokes: 4, topology: { enclosure: false, junction: 2 }, geometry: { axis: "vertical", symmetry: "vertical" }, strokeTypes: ["horizontal", "vertical"], content: { strokes: 2, boundaryContact: "left" } }),
+      R: region({ strokes: 4, topology: { enclosure: false, junction: 2 }, geometry: { axis: "vertical", symmetry: "vertical" }, strokeTypes: ["horizontal", "vertical"], content: { strokes: 2, boundaryContact: "left" } })
     }
   },
   {
