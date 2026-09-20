@@ -26,6 +26,7 @@ A partial query is valid. Collisions are expected. Refinement narrows the candid
 - `src/observation-path.js` — exact target-specific minimal observation paths
 - `src/relation-token.js` — executable region-scoped relation token draft
 - `src/query.js` — unified numeric + semantic input compiler
+- `src/feature-token.js` — generic semantic feature/membership token codec
 - `data/adversarial-corpus.js` — adversarial groups
 - `tests/matcher.test.js` — deterministic matcher tests
 - `tests/adaptive-matcher.test.js` — adaptive question tests
@@ -118,3 +119,13 @@ It demonstrates:
 - selecting an observed value without forcing it through a YES/NO interaction.
 
 The existing adaptive demo remains a diagnostic simulator for the binary question model.
+
+Semantic feature input now supports:
+
+```text
+feat(C.topology.junction)>=3
+feat(C.content.strokes)=2
+has(C.strokeTypes,dot)
+```
+
+These compile into the same semantic AST used by numeric and relation-token input.
