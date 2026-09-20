@@ -1,6 +1,9 @@
 import { CHARACTER_MODEL } from "../src/character-model.js";
+import { EXTENDED_COVERED_MODEL } from "../data/extended-covered-model.js";
 import { matchInput, parseInput } from "../src/query.js";
 import { FEATURE_CONCEPTS } from "../src/concepts.js";
+
+const LANGUAGE_MODEL = [...CHARACTER_MODEL, ...EXTENDED_COVERED_MODEL];
 
 const FEATURE_PROBES = [
   ["enclosure", "feat(C.topology.enclosure)=true"],
@@ -26,7 +29,7 @@ const RELATION_PROBES = [
 
 function probe(concept, token) {
   const parsed = parseInput(token);
-  const candidates = parsed ? matchInput(CHARACTER_MODEL, token) : [];
+  const candidates = parsed ? matchInput(LANGUAGE_MODEL, token) : [];
   return {
     concept,
     token,
