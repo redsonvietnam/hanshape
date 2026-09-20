@@ -65,13 +65,20 @@ export function matchCharacters(characters, query) {
 }
 
 function matchRelations(char, relations = []) {
-  const allRelations = Object.values(char.regions || {}).flatMap(region => region.relations || []);
-  return relations.every(query => allRelations.some(actual =>
-    actual.type === query.type &&
-    (query.a === undefined || actual.a === query.a) &&
-    (query.b === undefined || actual.b === query.b) &&
-    (query.value === undefined || actual.value === query.value)
-  ));
+  return relations.every(query => {
+    const candidateRegions = query.target
+      ? [char.regions?.[query.target]].filter(Boolean)
+      : Object.values(char.regions || {});
+
+    return candidateRegions.some(region =>
+      (region.relations || []).some(actual =>
+        actual.type === query.type &&
+        (query.a === undefined || actual.a === query.a) &&
+        (query.b === undefined || actual.b === query.b) &&
+        (query.value === undefined || actual.value === query.value)
+      )
+    );
+  });
 }
 
 export function matchSemantic(characters, query) {
