@@ -1,65 +1,240 @@
 import { CHARACTER_MODEL } from "../src/character-model.js";
 import { ADVERSARIAL_GROUPS } from "../data/adversarial-corpus.js";
-import { compareObservationPaths } from "../src/observation-path.js";
-import { compareMultivalueObservationPaths } from "../src/multivalue-observation.js";
+import {
+  applyAdaptiveAnswer,
+  chooseNextQuestion,
+  compareObservationPaths
+} from "../src/adaptive-matcher.js";
+import {
+  applyObservationAnswer,
+  chooseNextObservation,
+  compareMultivalueObservationPaths
+} from "../src/multivalue-observation.js";
 
-const group = names => CHARACTER_MODEL.filter(character => names.includes(character.char));
+const group = names =>
+  CHARACTER_MODEL.filter(character => names.includes(character.char));
 
-function benchmark(names) {
+function identifyBinary(candidates, targetChar) {
+  let remaining = [...candidates];
+  let questions = 0;
+
+  while (remaining.length > 1) {
+    const question = chooseNextQuestion(remaining, {
+      lookaheadDepth: 1,
+      costMode: "flat"
+    });
+
+    if (!question) return null;
+
+    const answer = question.yesCandidates.includes(targetChar);
+    remaining = applyAdaptiveAnswer(remaining, question, answer);
+    questions += 1;
+  }
+
+  return remaining.length === 1 && remaining[0].char === targetChar
+    ? questions
+    : null;
+}
+
+function identifyMultivalue(candidates, targetChar) {
+  let remaining = [...candidates];
+  let questions = 0;
+
+  while (remaining.length > 1) {
+    const observation = chooseNextObservation(remaining);
+    if (!observation) return null;
+
+    const target = remaining.find(candidate => candidate.char === targetChar);
+    if (!target) return null;
+
+    const value = observationValue(target, observation);
+    remaining = applyObservationAnswer(remaining, observation, value);
+    questions += 1;
+  }
+
+  return remaining.length === 1 && remaining[0].char === targetChar
+    ? questions
+    : null;
+}
+
+function observationValue(candidate, observation) {
+  const source = observation.target === "C"
+    ? candidate.regions?.C
+    : candidate.regions?.[observation.target];
+
+  if (!source) return "__missing__";
+
+  if (observation.kind === "region") {
+    return observation.path.reduce(
+      (value, key) => value?.[key],
+      source
+    ) ?? "__missing__";
+  }
+
+  if (observation.kind === "strokeType") {
+    return source.strokeTypes?.includes(observation.path[0]) ?? false;
+  }
+
+  if (observation.kind === "relation") {
+    const relation = (source.relations || []).find(item =>
+      [
+        item.type,
+        item.a ?? "",
+        item.b ?? ""
+      ].join("|") === observation.relationKey
+    );
+
+    return relation?.value ?? "__missing__";
+  }
+
+  return "__missing__";
+}
+
+function benchmarkFamily(names, mode = "full") {
   const candidates = group(names);
   const rows = [];
 
   for (const target of candidates) {
-    const binary = compareObservationPaths(candidates, target.char);
-    const multi = compareMultivalueObservationPaths(candidates, target.char);
+    if (mode === "full") {
+      const binary = compareObservationPaths(candidates, target.char);
+      const multi = compareMultivalueObservationPaths(candidates, target.char);
 
-    rows.push({
-      group: names.join("/"),
-      target: target.char,
-      binaryGreedy: binary?.greedyQuestions ?? null,
-      binaryOptimal: binary?.optimalQuestions ?? null,
-      multiGreedy: multi?.greedyQuestions ?? null,
-      multiOptimal: multi?.optimalQuestions ?? null,
-      multiVsBinary: multi && binary
-        ? multi.greedyQuestions - binary.greedyQuestions
-        : null
-    });
+      rows.push({
+        group: names.join("/"),
+        target: target.char,
+        binaryGreedy: binary?.greedyQuestions ?? null,
+        binaryOptimal: binary?.optimalQuestions ?? null,
+        multiGreedy: multi?.greedyQuestions ?? null,
+        multiOptimal: multi?.optimalQuestions ?? null,
+        multiVsBinary: binary && multi
+          ? multi.greedyQuestions - binary.greedyQuestions
+          : null
+      });
+    } else {
+      const binaryGreedy = identifyBinary(candidates, target.char);
+      const multiGreedy = identifyMultivalue(candidates, target.char);
+
+      rows.push({
+        group: names.join("/"),
+        target: target.char,
+        binaryGreedy,
+        multiGreedy,
+        multiVsBinary: (
+          binaryGreedy !== null &&
+          multiGreedy !== null
+        )
+          ? multiGreedy - binaryGreedy
+          : null
+      });
+    }
   }
 
   return rows;
 }
 
-const rows = ADVERSARIAL_GROUPS.flatMap(benchmark);
+function combinations(items, size) {
+  const result = [];
+
+  function visit(start, picked) {
+    if (picked.length === size) {
+      result.push(picked.slice());
+      return;
+    }
+
+    for (let i = start; i <= items.length - (size - picked.length); i += 1) {
+      picked.push(items[i]);
+      visit(i + 1, picked);
+      picked.pop();
+    }
+  }
+
+  visit(0, []);
+  return result;
+}
+
+const familyRows = ADVERSARIAL_GROUPS.flatMap(names =>
+  benchmarkFamily(names, "full")
+);
 
 console.log("HanShape binary vs multi-value observation benchmark");
 console.log("====================================================");
-console.table(rows);
+console.log("Adversarial families");
+console.table(familyRows);
 console.log("");
 
-const summary = [];
-for (const names of ADVERSARIAL_GROUPS) {
-  const family = rows.filter(row => row.group === names.join("/"));
-  summary.push({
-    group: names.join("/"),
-    cases: family.length,
-    binaryGreedyAvg: family.reduce((sum, row) => sum + row.binaryGreedy, 0) / family.length,
-    binaryOptimalAvg: family.reduce((sum, row) => sum + row.binaryOptimal, 0) / family.length,
-    multiGreedyAvg: family.reduce((sum, row) => sum + row.multiGreedy, 0) / family.length,
-    multiOptimalAvg: family.reduce((sum, row) => sum + row.multiOptimal, 0) / family.length
-  });
+const singles = CHARACTER_MODEL.filter(character => character.form === "SINGLE");
+const subsets = combinations(singles, 4);
+const subsetRows = [];
+
+for (const candidates of subsets) {
+  const names = candidates.map(candidate => candidate.char);
+
+  for (const target of candidates) {
+    const binaryGreedy = identifyBinary(candidates, target.char);
+    const multiGreedy = identifyMultivalue(candidates, target.char);
+
+    subsetRows.push({
+      group: names.join("/"),
+      target: target.char,
+      binaryGreedy,
+      multiGreedy,
+      delta: (
+        binaryGreedy !== null &&
+        multiGreedy !== null
+      )
+        ? binaryGreedy - multiGreedy
+        : null
+    });
+  }
 }
 
-console.log("Family summary");
-console.table(summary);
-
-const failures = rows.filter(row =>
-  row.binaryGreedy === null ||
-  row.binaryOptimal === null ||
-  row.multiGreedy === null ||
-  row.multiOptimal === null
+const valid = subsetRows.filter(row =>
+  row.binaryGreedy !== null &&
+  row.multiGreedy !== null
 );
 
+const improved = valid.filter(row => row.delta > 0);
+const equal = valid.filter(row => row.delta === 0);
+const worsened = valid.filter(row => row.delta < 0);
+
+console.log("All 4-character SINGLE subsets");
+console.log("==============================");
+console.log(
+  `subsets=${subsets.length} targetCases=${subsetRows.length} valid=${valid.length}`
+);
+console.log(
+  `binaryGreedyAvg=${(
+    valid.reduce((sum, row) => sum + row.binaryGreedy, 0) / valid.length
+  ).toFixed(3)}`
+);
+console.log(
+  `multiGreedyAvg=${(
+    valid.reduce((sum, row) => sum + row.multiGreedy, 0) / valid.length
+  ).toFixed(3)}`
+);
+console.log(
+  `improved=${improved.length} equal=${equal.length} worsened=${worsened.length}`
+);
+console.log(
+  `maxImprovement=${Math.max(...valid.map(row => row.delta))} maxWorsening=${Math.min(...valid.map(row => row.delta))}`
+);
+
+const failures = [
+  ...familyRows.filter(row =>
+    row.binaryGreedy === null ||
+    row.binaryOptimal === null ||
+    row.multiGreedy === null ||
+    row.multiOptimal === null
+  ),
+  ...subsetRows.filter(row =>
+    row.binaryGreedy === null ||
+    row.multiGreedy === null
+  )
+];
+
 if (failures.length > 0) {
-  console.error("FAIL: at least one target could not be identified by one of the observation engines.");
+  console.error(
+    `FAIL: ${failures.length} target cases could not be identified.`
+  );
   process.exitCode = 1;
 }
