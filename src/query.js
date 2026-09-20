@@ -1,3 +1,4 @@
+import { matchSemantic } from "./matcher.js";
 import { parseBase } from "./parser.js";
 import { relationTokenToSemanticQuery } from "./relation-token.js";
 
@@ -207,4 +208,11 @@ export function parseInput(input) {
       null
     )
   };
+}
+
+export function matchInput(characters, input) {
+  const parsed = parseInput(input);
+  if (!parsed) return [];
+
+  return matchSemantic(characters, parsed.query);
 }
