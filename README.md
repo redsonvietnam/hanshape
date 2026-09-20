@@ -56,6 +56,25 @@ next question
 
 This is the beginning of the "20 Questions for Han characters" interaction model.
 
+
+## Interactive demo
+
+The repository includes a small browser demo for the adaptive matcher.
+
+Run locally:
+
+```bash
+npm run demo
+```
+
+Then open:
+
+```
+http://localhost:4173
+```
+
+The demo lets you choose an adversarial candidate group, select a hidden target character for simulation, and answer YES/NO while HanShape recomputes the candidate set. The lookahead depth can be changed between 1 and 3.
+
 ## Status
 
 Research prototype. The ontology is being stress-tested while the adaptive matcher is developed incrementally.
