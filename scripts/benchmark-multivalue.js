@@ -2,9 +2,9 @@ import { CHARACTER_MODEL } from "../src/character-model.js";
 import { ADVERSARIAL_GROUPS } from "../data/adversarial-corpus.js";
 import {
   applyAdaptiveAnswer,
-  chooseNextQuestion,
-  compareObservationPaths
+  chooseNextQuestion
 } from "../src/adaptive-matcher.js";
+import { compareObservationPaths } from "../src/observation-path.js";
 import {
   applyObservationAnswer,
   chooseNextObservation,
