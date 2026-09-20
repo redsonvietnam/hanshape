@@ -17,8 +17,7 @@ const EXAMPLES = [
   "35",
   "35 len(C.hUpper,C.hLower)<",
   "34 pos(C.dot,C.mainAxis)=R",
-  "44 40",
-  "84 len(L.hUpper,L.hLower)<"
+  "844"
 ];
 
 let candidates = CHARACTER_MODEL;
