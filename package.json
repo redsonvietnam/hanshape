@@ -11,6 +11,7 @@
     "benchmark:pairs": "node scripts/benchmark-pairs.js",
     "benchmark:observation-path": "node scripts/benchmark-observation-path.js",
     "audit:frontier": "node scripts/audit-frontier.js",
-    "benchmark:covered-extensions": "node scripts/benchmark-covered-extensions.js"
+    "benchmark:covered-extensions": "node scripts/benchmark-covered-extensions.js",
+    "benchmark:input-expressiveness": "node scripts/benchmark-input-expressiveness.js"
   }
 }
