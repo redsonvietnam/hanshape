@@ -262,8 +262,13 @@ function candidateKey(candidates) {
   return candidates.map(candidate => candidate.char).sort().join("\\u0000");
 }
 
-function comparePlans(a, b) {
+function comparePlans(a, b, costMode = "flat") {
   if (!b) return a;
+
+  if (costMode === "weighted" && a.cost !== b.cost) {
+    return a.cost < b.cost ? a : b;
+  }
+
   if (a.questions !== b.questions) {
     return a.questions < b.questions ? a : b;
   }
