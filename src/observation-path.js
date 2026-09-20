@@ -85,11 +85,30 @@ export function minimumObservationPath(candidates, targetChar, options = {}) {
         || a.label.localeCompare(b.label);
     });
 
+    const currentLowerBound = Math.ceil(Math.log2(current.length));
     let best = null;
 
     for (const question of questions) {
       const branch = branchForTarget(current, question, targetChar);
       if (branch.length >= current.length) continue;
+
+      // With flat cost, a branch of size m cannot be solved in fewer than
+      // ceil(log2(m)) further binary observations. This gives an exact
+      // branch-and-bound rule without sacrificing optimality.
+      if (costMode === "flat" && best) {
+        const branchLowerBound = Math.ceil(Math.log2(branch.length));
+        if (1 + branchLowerBound >= best.questions) continue;
+      }
+
+      if (branch.length === 1) {
+        best = {
+          questions: 1,
+          cost: question.recognitionCost,
+          path: [question],
+          remaining: [targetChar]
+        };
+        break;
+      }
 
       const child = solve(branch);
       if (!child) continue;
@@ -102,6 +121,14 @@ export function minimumObservationPath(candidates, targetChar, options = {}) {
       };
 
       best = comparePaths(candidate, best, costMode);
+
+      if (
+        costMode === "flat" &&
+        best &&
+        best.questions === currentLowerBound
+      ) {
+        break;
+      }
     }
 
     memo.set(key, best);
