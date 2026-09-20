@@ -103,3 +103,23 @@ Prefer this order:
 A concept with `syntax=supported` and `corpusMatches=0` is not necessarily a language failure. It may indicate that the character model has not yet been annotated with that concept.
 
 This prevents confusing missing corpus annotations with missing grammar support.
+## v0.9 capability snapshot
+
+The capability audit distinguishes syntax support from corpus annotation.
+
+Current experimental probes show that the generic semantic language can express:
+
+- topology: enclosure, connectivity, junction, crossing, boundary contact
+- geometry: axis, curvature, symmetry, convergence
+- composition/content: density, repetition, content stroke count
+- set membership: stroke types
+- relations: relative length, relative position, parallelism, alignment
+
+Current corpus evidence is uneven. In the latest probe set:
+
+- `crossing` has an experimental match through `十`
+- `curvature` has an experimental match through `乙`
+- `parallelism` and `alignment` are syntactically supported but have no annotated corpus match yet
+- `density`, `repetition`, and `orientation` remain syntax/model-coverage probes rather than reasons to add new primitives
+
+This is intentional. A concept with no corpus evidence should be investigated before it is promoted, compressed numerically, or used as an optimization target.
