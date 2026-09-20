@@ -1,6 +1,4 @@
 
-import { matchSemantic } from "./matcher.js";
-
 const TARGETS = ["C", "L", "R", "T", "B", "O", "I"];
 const MISSING = "__missing__";
 
