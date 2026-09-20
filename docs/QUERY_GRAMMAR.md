@@ -15,7 +15,17 @@ Refinement grammar:
 REFINE := 0 TARGET FEATURE_DIGIT
 ```
 
-The leading `0` is an operator, not a feature concept.
+The leading `0` is an operator in the refinement namespace. A final `0` may simultaneously be a feature digit in the feature namespace.
+
+```text
+044
+^^^
+││└─ feature digit namespace
+│└── target namespace
+└─── operator namespace
+```
+
+The parser resolves these namespaces by position/context; the semantic matcher receives only the resolved query.
 
 ## Abstract layer
 
