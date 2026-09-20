@@ -22,10 +22,12 @@ A partial query is valid. Collisions are expected. Refinement narrows the candid
 - `src/character-model.js` — semantic morphology corpus
 - `src/parser.js` — digits → abstract query
 - `src/matcher.js` — abstract query → candidates
-- `src/adaptive-matcher.js` — candidate set → next best question
+- `src/adaptive-matcher.js` — candidate set → next best visual observation
+- `src/observation-path.js` — exact target-specific minimal observation paths
 - `data/adversarial-corpus.js` — adversarial groups
 - `tests/matcher.test.js` — deterministic matcher tests
 - `tests/adaptive-matcher.test.js` — adaptive question tests
+- `tests/observation-path.test.js` — observation-path optimality tests
 
 ## Design rules
 
@@ -34,7 +36,8 @@ A partial query is valid. Collisions are expected. Refinement narrows the candid
 3. A collision is a valid partial query.
 4. Relations should be semantic before they are numeric.
 5. Do not add a primitive merely to encode one character.
-6. The adaptive layer selects questions; the matcher remains deterministic.
+6. The adaptive layer selects observations; the matcher remains deterministic.
+7. Measure greedy observation effort against an exact path before optimizing the selector.
 
 ## Adaptive search
 
@@ -75,6 +78,20 @@ http://localhost:4173
 
 The demo lets you choose an adversarial candidate group, select a hidden target character for simulation, and answer YES/NO while HanShape recomputes the candidate set. The lookahead depth can be changed between 1 and 3.
 
+## Research metric
+
+The adaptive matcher is now paired with an exact target-specific observation-path solver. This measures the gap between the current greedy policy, the best path available in the current semantic question space, and the binary information lower bound.
+
+Run the benchmark with:
+
+```bash
+npm run benchmark:observation-path
+```
+
+See `docs/OBSERVATION_PATHS.md` for interpretation and research rules.
+
+The adaptive demo remains a laboratory/debugging tool rather than the final HanShape interaction model.
+
 ## Status
 
-Research prototype. The ontology is being stress-tested while the adaptive matcher is developed incrementally.
+Research prototype. The next bottlenecks are corpus coverage, input expressiveness, and human observation cost—not deeper lookahead by itself.
