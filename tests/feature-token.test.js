@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { CHARACTER_MODEL } from "../src/character-model.js";
+import { EXTENDED_COVERED_MODEL } from "../data/extended-covered-model.js";
 import { matchInput, parseInput } from "../src/query.js";
 import {
   parseFeatureToken,
@@ -193,5 +194,21 @@ test("generic relation token serializer is deterministic", () => {
   assert.equal(
     genericRelationTokenFromParts("C", "parallelism", true),
     "rel(C.relation,parallelism)=true"
+  );
+});
+
+test("experimental curvature probe uses the existing curvature concept", () => {
+  assert.deepEqual(
+    matchInput(EXTENDED_COVERED_MODEL, "feat(C.geometry.curvature)=curved")
+      .map(candidate => candidate.char),
+    ["乙"]
+  );
+});
+
+test("experimental crossing probe uses the existing crossing concept", () => {
+  assert.deepEqual(
+    matchInput(EXTENDED_COVERED_MODEL, "feat(C.topology.crossing)=true")
+      .map(candidate => candidate.char),
+    ["十"]
   );
 });
