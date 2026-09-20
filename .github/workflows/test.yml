@@ -21,3 +21,4 @@ jobs:
       - run: npm run audit:frontier
       - run: npm run benchmark:covered-extensions
       - run: npm run benchmark:input-expressiveness
+      - run: npm run benchmark:multivalue
