@@ -17,8 +17,13 @@ function branchForTarget(candidates, question, targetChar) {
   return applyAdaptiveAnswer(candidates, question, answer);
 }
 
-function comparePaths(a, b) {
+function comparePaths(a, b, costMode) {
   if (!b) return a;
+
+  if (costMode === "weighted" && a.cost !== b.cost) {
+    return a.cost < b.cost ? a : b;
+  }
+
   if (a.questions !== b.questions) {
     return a.questions < b.questions ? a : b;
   }
@@ -96,7 +101,7 @@ export function minimumObservationPath(candidates, targetChar, options = {}) {
         remaining: child.remaining
       };
 
-      best = comparePaths(candidate, best);
+      best = comparePaths(candidate, best, costMode);
     }
 
     memo.set(key, best);
