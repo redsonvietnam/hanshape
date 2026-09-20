@@ -24,6 +24,7 @@ A partial query is valid. Collisions are expected. Refinement narrows the candid
 - `src/matcher.js` — abstract query → candidates
 - `src/adaptive-matcher.js` — candidate set → next best visual observation
 - `src/observation-path.js` — exact target-specific minimal observation paths
+- `src/relation-token.js` — executable region-scoped relation token draft
 - `data/adversarial-corpus.js` — adversarial groups
 - `tests/matcher.test.js` — deterministic matcher tests
 - `tests/adaptive-matcher.test.js` — adaptive question tests
