@@ -1,4 +1,4 @@
-import { FORM_DIGIT_BINDING, TARGET_DIGIT_BINDING, DIGIT_BINDING } from "./digit-binding.js";
+import { FORM_DIGIT_BINDING, TARGET_DIGIT_BINDING, OPERATOR_DIGIT_BINDING, FEATURE_DIGIT_BINDING } from "./digit-binding.js";
 
 export function parseBase(code) {
   const raw = String(code ?? "").replace(/\s+/g, "");
