@@ -1,6 +1,6 @@
 import { matchSemantic } from "./matcher.js";
 import { parseBase } from "./parser.js";
-import { relationTokenToSemanticQuery } from "./relation-token.js";
+import { relationTokenToSemanticQuery, genericRelationTokenToSemanticQuery } from "./relation-token.js";
 import { featureTokenToSemanticQuery, hasTokenToSemanticQuery } from "./feature-token.js";
 
 export const QUERY_LANGUAGE_VERSION = "0.9";
@@ -189,6 +189,15 @@ export function parseInputToken(token) {
       kind: "relation",
       raw,
       query: relationQuery
+    };
+  }
+
+  const genericRelationQuery = genericRelationTokenToSemanticQuery(raw);
+  if (genericRelationQuery) {
+    return {
+      kind: "generic-relation",
+      raw,
+      query: genericRelationQuery
     };
   }
 
