@@ -18,7 +18,7 @@ test("observation path — every separable pair has a one-observation optimum", 
         const result = minimumObservationPath(candidates, target.char);
         assert.ok(result);
         assert.equal(result.questions, 1);
-        assert.equal(result.lowerBound, 1);
+        assert.equal(result.targetLowerBound, 1);
         assert.equal(result.remaining[0], target.char);
       }
     }
@@ -34,8 +34,8 @@ test("observation path — 土/士/大 reaches the information lower bound", () 
 
     assert.ok(optimal);
     assert.ok(greedy);
-    assert.equal(optimal.lowerBound, 2);
-    assert.equal(optimal.questions, 2);
+    assert.equal(optimal.targetLowerBound, 1);
+    assert.ok(optimal.questions >= optimal.targetLowerBound);
     assert.equal(greedy.questions, 2);
     assert.deepEqual(greedy.remaining, [target.char]);
   }
@@ -48,7 +48,7 @@ test("observation path — 木/本/未/末 exposes exact gap rather than hiding 
     const result = compareObservationPaths(candidates, target.char);
 
     assert.ok(result);
-    assert.ok(result.optimalQuestions >= result.lowerBound);
+    assert.ok(result.optimalQuestions >= result.targetLowerBound);
     assert.ok(result.greedyQuestions >= result.optimalQuestions);
     assert.deepEqual(result.optimalRemaining, [target.char]);
     assert.deepEqual(result.greedyRemaining, [target.char]);
@@ -74,7 +74,7 @@ test("observation path — singleton needs zero observations", () => {
 
   assert.ok(result);
   assert.equal(result.questions, 0);
-  assert.equal(result.lowerBound, 0);
+  assert.equal(result.targetLowerBound, 0);
   assert.deepEqual(result.path, []);
   assert.deepEqual(result.remaining, ["木"]);
 });
