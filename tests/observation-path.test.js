@@ -50,7 +50,8 @@ test("observation path — 木/本/未/末 exposes exact gap rather than hiding 
     assert.ok(result);
     assert.ok(result.optimalQuestions >= result.lowerBound);
     assert.ok(result.greedyQuestions >= result.optimalQuestions);
-    assert.equal(result.remaining ?? undefined, undefined);
+    assert.deepEqual(result.optimalRemaining, [target.char]);
+    assert.deepEqual(result.greedyRemaining, [target.char]);
     assert.equal(result.optimalPath.at(-1).label !== undefined, true);
     assert.equal(result.greedyPath.at(-1).label !== undefined, true);
   }
