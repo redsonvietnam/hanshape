@@ -84,6 +84,8 @@ The adaptive matcher is now paired with an exact target-specific observation-pat
 
 The next layer measures a separate **input expressiveness gap**: whether those semantic observations can actually be encoded by the current numeric grammar. See `docs/INPUT_EXPRESSIVENESS.md` and run `npm run benchmark:input-expressiveness`.
 
+The adaptive research layer now also tests multi-value observations and a semantic `not` operator so an observed value can flow back through the same matcher instead of creating a second matching system.
+
 Run the benchmark with:
 
 ```bash
