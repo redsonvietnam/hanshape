@@ -124,6 +124,13 @@ export function encodeSemanticQuestion(question) {
 
   const query = question.query;
 
+  if (query.not) {
+    return {
+      supported: false,
+      reason: "not-operator-not-bound"
+    };
+  }
+
   if (Array.isArray(query.relations) && query.relations.length > 0) {
     if (
       query.relations.length === 1 &&
