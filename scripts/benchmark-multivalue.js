@@ -5,6 +5,7 @@ import {
   chooseNextQuestion
 } from "../src/adaptive-matcher.js";
 import { compareObservationPaths } from "../src/observation-path.js";
+import { encodeObservationValue } from "../src/query-encoding.js";
 import {
   applyObservationAnswer,
   chooseNextObservation,
