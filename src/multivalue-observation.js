@@ -113,7 +113,7 @@ function readObservationValue(candidate, observation) {
 }
 
 function makeRegionObservations(candidates, target) {
-  if (!featureSource(candidates[0], target)) return [];
+  if (!candidates.every(candidate => featureSource(candidate, target))) return [];
 
   const observations = [];
 
