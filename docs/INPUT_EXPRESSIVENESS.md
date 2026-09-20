@@ -92,3 +92,14 @@ Prefer this order:
 2. determine whether an existing semantic relation can express it;
 3. design the shortest clear input operator;
 4. only then allocate a compact numeric binding if the interaction data justifies it.
+
+## Language capability audit
+
+`scripts/audit-language-capability.js` separates two questions:
+
+1. can the semantic language parse and compile the concept?
+2. does the current character corpus actually contain annotated data that can satisfy the query?
+
+A concept with `syntax=supported` and `corpusMatches=0` is not necessarily a language failure. It may indicate that the character model has not yet been annotated with that concept.
+
+This prevents confusing missing corpus annotations with missing grammar support.
