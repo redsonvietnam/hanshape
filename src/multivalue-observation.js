@@ -1,3 +1,6 @@
+import { matchSemantic } from "./matcher.js";
+import { observationToSemanticQuery } from "./observation-query.js";
+
 
 const TARGETS = ["C", "L", "R", "T", "B", "O", "I"];
 const MISSING = "__missing__";
@@ -286,6 +289,12 @@ export function chooseNextObservation(candidates, options = {}) {
 }
 
 export function applyObservationAnswer(candidates, observation, value) {
+  const query = observationToSemanticQuery(observation, value);
+
+  if (query) {
+    return matchSemantic(candidates, query);
+  }
+
   return candidates.filter(
     candidate => readObservationValue(candidate, observation) === value
   );
