@@ -8,13 +8,13 @@ import {
 const group = names =>
   CHARACTER_MODEL.filter(character => names.includes(character.char));
 
-function identify(candidates, target, lookaheadDepth) {
+function identify(candidates, target, options) {
   let remaining = [...candidates];
   let questions = 0;
   const trace = [];
 
   while (remaining.length > 1 && questions < 20) {
-    const question = chooseNextQuestion(remaining, { lookaheadDepth });
+    const question = chooseNextQuestion(remaining, options);
     if (!question) break;
 
     const answer = question.yesCandidates.includes(target.char);
@@ -55,22 +55,26 @@ const rows = [];
 
 for (const names of ADVERSARIAL_GROUPS) {
   const candidates = group(names);
-  for (const depth of [1, 2, 3]) {
-    const results = candidates.map(target =>
-      identify(candidates, target, depth)
-    );
+  for (const costMode of ["weighted", "flat"]) {
+    for (const depth of [1, 2]) {
+      const options = { lookaheadDepth: depth, costMode };
+      const results = candidates.map(target =>
+        identify(candidates, target, options)
+      );
     const summary = stats(results);
     rows.push({
-      group: names.join(""),
-      depth,
-      ...summary
-    });
+        group: names.join(""),
+        costMode,
+        depth,
+        ...summary
+      });
 
-    for (const result of results) {
-      if (!result.success) {
-        console.log(
-          `FAIL group=${names.join("/")} depth=${depth} remaining=${result.remaining.join("/")}`
-        );
+      for (const result of results) {
+        if (!result.success) {
+          console.log(
+            `FAIL group=${names.join("/")} costMode=${costMode} depth=${depth} remaining=${result.remaining.join("/")}`
+          );
+        }
       }
     }
   }
@@ -82,14 +86,16 @@ console.log("===========================");
 console.table(rows);
 console.log("");
 
-for (const depth of [1, 2, 3]) {
-  const depthRows = rows.filter(row => row.depth === depth);
-  const totalCases = depthRows.reduce((sum, row) => sum + row.cases, 0);
-  const totalSolved = depthRows.reduce((sum, row) => sum + row.solved, 0);
-  const average = depthRows.reduce((sum, row) => sum + row.average * row.cases, 0) / totalCases;
-  const max = Math.max(...depthRows.map(row => row.max));
+for (const costMode of ["weighted", "flat"]) {
+  for (const depth of [1, 2]) {
+    const selected = rows.filter(row => row.costMode === costMode && row.depth === depth);
+    const totalCases = selected.reduce((sum, row) => sum + row.cases, 0);
+    const totalSolved = selected.reduce((sum, row) => sum + row.solved, 0);
+    const average = selected.reduce((sum, row) => sum + row.average * row.cases, 0) / totalCases;
+    const max = Math.max(...selected.map(row => row.max));
 
-  console.log(
-    `depth=${depth} cases=${totalCases} solved=${totalSolved}/${totalCases} averageQuestions=${average.toFixed(3)} maxQuestions=${max}`
-  );
+    console.log(
+      `costMode=${costMode} depth=${depth} cases=${totalCases} solved=${totalSolved}/${totalCases} averageQuestions=${average.toFixed(3)} maxQuestions=${max}`
+    );
+  }
 }
