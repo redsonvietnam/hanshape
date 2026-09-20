@@ -136,7 +136,7 @@ test("土/士", () => {
   assert.deepEqual(chars(matchSemantic(corpus, {
     form: "SINGLE",
     strokes: 3
-  })), ["大", "土", "士"]);
+  })), ["土", "士", "大"]);
 
   assert.deepEqual(chars(matchSemantic(corpus, {
     form: "SINGLE",
@@ -226,7 +226,8 @@ test("明/林/朋/服", () => {
     form: "LR",
     regions: {
       L: { topology: { enclosure: false } },
-      R: { topology: { enclosure: false }, geometry: { symmetry: "vertical" } }
+      R: { topology: { enclosure: false }, geometry: { symmetry: "vertical" } },
+      L: { content: null }
     }
   })), ["林"]);
 });
