@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {
   parseRelationToken,
   relationTokenToSemanticQuery
-} from "../src/relation-token.js";
+  semanticRelationToToken\n} from "../src/relation-token.js";
 
 test("relation token parses relative length", () => {
   assert.deepEqual(
@@ -55,4 +55,18 @@ test("relation token rejects malformed syntax", () => {
   assert.equal(parseRelationToken("length(C.hUpper,C.hLower)<"), null);
   assert.equal(parseRelationToken("pos(C.dot,C.axis)=Z"), null);
   assert.equal(parseRelationToken("contact(C.other)=BOTH"), null);
+});
+
+test("semantic relation token round-trips relative length", () => {
+  const relation = {
+    type: "relativeLength",
+    target: "C",
+    a: "hUpper",
+    b: "hLower",
+    value: "shorter"
+  };
+
+  const token = semanticRelationToToken(relation);
+  assert.equal(token, "len(C.hUpper,C.hLower)<");
+  assert.deepEqual(parseRelationToken(token), relation);
 });
