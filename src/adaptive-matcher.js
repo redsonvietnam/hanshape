@@ -359,8 +359,8 @@ function betterPlan(a, b) {
   if (a.informationGain !== b.informationGain) {
     return a.informationGain > b.informationGain ? a : b;
   }
-  if (a.cost !== b.cost) {
-    return a.cost < b.cost ? a : b;
+  if (a.recognitionCost !== b.recognitionCost) {
+    return a.recognitionCost < b.recognitionCost ? a : b;
   }
   return priorityOf(a.concept) - priorityOf(b.concept) <= 0 ? a : b;
 }
