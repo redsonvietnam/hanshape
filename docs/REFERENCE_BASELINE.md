@@ -41,3 +41,25 @@ Across exact multi-value paths in the six adversarial families, the most frequen
 | `enclosure` | 1 | yes |
 
 The implication is not to add six digits. It is to identify which semantic relations deserve a compact relation syntax first, then allocate numeric bindings only after that syntax is stable.
+
+## Target-agnostic decision-tree reference
+
+An additional reference calculation optimized the complete decision tree rather than a target-specific path.
+
+On all 1,365 four-character SINGLE subsets:
+
+- binary entropy-greedy average depth: 2.044
+- binary exact-tree average depth: 2.044
+- multi-value entropy-greedy average depth: 1.750
+- multi-value exact-tree average depth: 1.750
+- no subset had a greedy tree-depth gap in either model.
+
+On a deterministic sample of 512 five-character SINGLE subsets:
+
+- binary greedy average depth: 2.418
+- binary exact-tree average depth: 2.418
+- multi-value greedy average depth: 2.071
+- multi-value exact-tree average depth: 2.071
+- no sampled subset had a greedy tree-depth gap.
+
+This suggests that additional lookahead is not currently the main optimization target. Corpus expansion and input expressiveness remain more valuable.
