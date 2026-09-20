@@ -10,6 +10,11 @@ import {
   hasTokenToSemanticQuery,
   hasTokenFromParts
 } from "../src/feature-token.js";
+import {
+  parseGenericRelationToken,
+  genericRelationTokenToSemanticQuery,
+  genericRelationTokenFromParts
+} from "../src/relation-token.js";
 
 test("feature token parses enum-valued geometry", () => {
   assert.deepEqual(
@@ -126,4 +131,67 @@ test("malformed feature and membership tokens are rejected", () => {
   assert.equal(parseFeatureToken("feat(C)=true"), null);
   assert.equal(parseFeatureToken("feat(X.geometry.axis)=vertical"), null);
   assert.equal(parseHasToken("has(C.strokeTypes)"), null);
+});
+
+test("generic relation token parses parallelism", () => {
+  assert.deepEqual(
+    parseGenericRelationToken("rel(C.relation,parallelism)=true"),
+    {
+      kind: "generic-relation",
+      raw: "rel(C.relation,parallelism)=true",
+      target: "C",
+      type: "parallelism",
+      path: "relation",
+      value: true
+    }
+  );
+});
+
+test("generic relation token compiles to region-scoped semantic relation", () => {
+  assert.deepEqual(
+    genericRelationTokenToSemanticQuery("rel(C.relation,alignment)=aligned"),
+    {
+      relations: [{
+        target: "C",
+        type: "alignment",
+        value: "aligned"
+      }]
+    }
+  );
+});
+
+test("generic relation token end-to-end matches a scoped relation", () => {
+  const corpus = [{
+    char: "X",
+    form: "SINGLE",
+    strokes: 4,
+    regions: {
+      C: {
+        strokes: 4,
+        relations: [{ type: "parallelism", value: true }]
+      }
+    }
+  }, {
+    char: "Y",
+    form: "SINGLE",
+    strokes: 4,
+    regions: {
+      C: {
+        strokes: 4,
+        relations: []
+      }
+    }
+  }];
+
+  assert.deepEqual(
+    matchInput(corpus, "rel(C.relation,parallelism)=true").map(candidate => candidate.char),
+    ["X"]
+  );
+});
+
+test("generic relation token serializer is deterministic", () => {
+  assert.equal(
+    genericRelationTokenFromParts("C", "parallelism", true),
+    "rel(C.relation,parallelism)=true"
+  );
 });
