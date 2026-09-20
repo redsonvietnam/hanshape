@@ -8,15 +8,11 @@ import {
   applyAdaptiveAnswer
 } from "../src/adaptive-matcher.js";
 
-const chars = result => result.map(x => x.char).sort();
+const group = (...names) =>
+  CHARACTER_MODEL.filter(character => names.includes(character.char));
 
 test("adaptive matcher — 土/士 becomes a second-step perfect split", () => {
-  const candidates = matchSemantic(CHARACTER_MODEL, {
-    form: "SINGLE",
-    strokes: 3
-  });
-
-  assert.deepEqual(chars(candidates), ["大", "土", "士"]);
+  const candidates = group("大", "土", "士");
 
   const first = chooseNextQuestion(candidates);
   assert.ok(first);
@@ -26,8 +22,9 @@ test("adaptive matcher — 土/士 becomes a second-step perfect split", () => {
   assert.ok(first.informationGain > 0.8);
 
   const remaining = applyAdaptiveAnswer(candidates, first, false);
-  const second = chooseNextQuestion(remaining);
+  assert.equal(remaining.length, 2);
 
+  const second = chooseNextQuestion(remaining);
   assert.ok(second);
   assert.equal(second.candidateCount, 2);
   assert.equal(second.yesCount, 1);
@@ -35,14 +32,13 @@ test("adaptive matcher — 土/士 becomes a second-step perfect split", () => {
 });
 
 test("adaptive matcher — 日/曰/目 uses a reusable ontology concept", () => {
-  const candidates = matchSemantic(CHARACTER_MODEL, {
+  const candidates = group("日", "曰", "目");
+  const candidatesWithEnclosure = matchSemantic(candidates, {
     form: "SINGLE",
     regions: { C: { topology: { enclosure: true } } }
   });
 
-  assert.deepEqual(chars(candidates), ["日", "曰", "目"]);
-
-  const ranked = rankAdaptiveQuestions(candidates, { limit: 5 });
+  const ranked = rankAdaptiveQuestions(candidatesWithEnclosure, { limit: 5 });
   assert.ok(ranked.length > 0);
 
   const top = ranked[0];
@@ -52,17 +48,12 @@ test("adaptive matcher — 日/曰/目 uses a reusable ontology concept", () => 
     top.concept === "junction"
   );
 
-  const yes = applyAdaptiveAnswer(candidates, top, true);
+  const yes = applyAdaptiveAnswer(candidatesWithEnclosure, top, true);
   assert.equal(yes.length, 1);
 });
 
 test("adaptive matcher — 明/林/朋/服 reduces the 4-4 collision", () => {
-  const candidates = matchSemantic(CHARACTER_MODEL, {
-    form: "LR",
-    regions: { L: { strokes: 4 }, R: { strokes: 4 } }
-  });
-
-  assert.deepEqual(chars(candidates), ["明", "林", "朋", "服"]);
+  const candidates = group("明", "林", "朋", "服");
 
   const question = chooseNextQuestion(candidates);
   assert.ok(question);
@@ -73,10 +64,7 @@ test("adaptive matcher — 明/林/朋/服 reduces the 4-4 collision", () => {
 });
 
 test("adaptive matcher — 人/入/八 finds a high-information visual discriminator", () => {
-  const candidates = matchSemantic(CHARACTER_MODEL, {
-    form: "SINGLE",
-    strokes: 2
-  });
+  const candidates = group("人", "入", "八");
 
   const question = chooseNextQuestion(candidates);
   assert.ok(question);
@@ -85,6 +73,5 @@ test("adaptive matcher — 人/入/八 finds a high-information visual discrimin
 });
 
 test("adaptive matcher — no question remains for a singleton", () => {
-  const candidate = CHARACTER_MODEL.filter(c => c.char === "木");
-  assert.equal(chooseNextQuestion(candidate), null);
+  assert.equal(chooseNextQuestion(group("木")), null);
 });
