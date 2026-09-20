@@ -19,12 +19,17 @@ function combinations(items, size) {
   return result;
 }
 
-function identify(candidates, target, depth) {
+function identify(candidates, target, depth, policyCache) {
   let remaining = [...candidates];
   let questions = 0;
 
   while (remaining.length > 1 && questions < 20) {
-    const question = chooseNextQuestion(remaining, { lookaheadDepth: depth });
+    const key = `${depth}:${remaining.map(x => x.char).sort().join("\\0")}`;
+    let question = policyCache.get(key);
+    if (question === undefined) {
+      question = chooseNextQuestion(remaining, { lookaheadDepth: depth });
+      policyCache.set(key, question ?? null);
+    }
     if (!question) return { success: false, questions };
     const answer = question.yesCandidates.includes(target.char);
     remaining = applyAdaptiveAnswer(remaining, question, answer);
@@ -52,6 +57,7 @@ for (const size of sizes) {
   let changedTrees = 0;
   let bestImprovement = 0;
   let firstExamples = [];
+  const policyCache = new Map();
 
   for (const subset of subsets) {
     const greedyFirst = chooseNextQuestion(subset, { lookaheadDepth: 1 });
@@ -70,8 +76,8 @@ for (const size of sizes) {
     }
 
     for (const target of subset) {
-      const a = identify(subset, target, 1);
-      const b = identify(subset, target, 2);
+      const a = identify(subset, target, 1, policyCache);
+      const b = identify(subset, target, 2, policyCache);
       cases += 1;
       total1 += a.questions;
       total2 += b.questions;
