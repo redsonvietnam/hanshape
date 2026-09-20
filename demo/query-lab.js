@@ -1,5 +1,6 @@
 import { CHARACTER_MODEL } from "../src/character-model.js";
 import { matchInput, parseInput, mergeSemanticQueries } from "../src/query.js";
+import { matchSemantic } from "../src/matcher.js";
 import { observationToSemanticQuery } from "../src/observation-query.js";
 import { rankAdaptiveObservations, applyObservationAnswer } from "../src/multivalue-observation.js";
 
@@ -48,9 +49,9 @@ function applyObservedValue(observation, value) {
 
   sessionQuery = mergeSemanticQueries(sessionQuery, observedQuery);
   const effectiveQuery = mergeSemanticQueries(baseQuery, sessionQuery);
-  candidates = matchInput(CHARACTER_MODEL, effectiveQuery
-    ? JSON.stringify(effectiveQuery)
-    : els.input.value);
+  candidates = effectiveQuery
+    ? matchSemantic(CHARACTER_MODEL, effectiveQuery)
+    : matchInput(CHARACTER_MODEL, els.input.value);
   renderState({ query: effectiveQuery });
 }
 
