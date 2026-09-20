@@ -11,11 +11,13 @@ const FEATURE_PROBES = [
   ["junction", "feat(C.topology.junction)>=3"],
   ["crossing", "feat(C.topology.crossing)=true"],
   ["boundaryContact", "feat(C.content.boundaryContact)=left"],
+  ["orientation", "feat(C.geometry.orientation)=vertical"],
   ["axis", "feat(C.geometry.axis)=vertical"],
-  ["curvature", "feat(C.geometry.curvature)=mixed"],
+  ["curvature", "feat(C.geometry.curvature)=curved"],
   ["symmetry", "feat(C.geometry.symmetry)=vertical"],
   ["convergence", "feat(C.geometry.convergence)=upper"],
   ["density", "feat(C.composition.density)=dense"],
+  ["repetition", "feat(C.composition.repetition)>=2"],
   ["strokeType", "has(C.strokeTypes,dot)"],
   ["content.strokes", "feat(C.content.strokes)=2"]
 ];
