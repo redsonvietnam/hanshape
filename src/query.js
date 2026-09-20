@@ -11,6 +11,27 @@ function setNested(root, path, value) {
   return root;
 }
 
+function mergeDeep(base, extra) {
+  const output = structuredClone(base || {});
+
+  for (const [key, value] of Object.entries(extra || {})) {
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      output[key] &&
+      typeof output[key] === "object" &&
+      !Array.isArray(output[key])
+    ) {
+      output[key] = mergeDeep(output[key], value);
+    } else {
+      output[key] = structuredClone(value);
+    }
+  }
+
+  return output;
+}
+
 function numericRefinementToQuery(refinement) {
   const path = refinement.query.path.split(".");
 
@@ -39,10 +60,15 @@ function numericRefinementToQuery(refinement) {
 
   if (refinement.query.operator) {
     condition[refinement.query.operator] = refinement.query.value;
+  } else if (refinement.query.equals !== undefined) {
+    setNested(region, path, refinement.query.equals);
+    return {
+      regions: {
+        [refinement.target]: region
+      }
+    };
   } else {
-    Object.assign(condition, refinement.query.equals !== undefined
-      ? refinement.query.equals
-      : refinement.query.value);
+    setNested(region, path, refinement.query.value);
   }
 
   setNested(region, path, condition);
@@ -91,10 +117,10 @@ export function numericToSemanticQuery(parsed) {
     if (next.regions) {
       query.regions ??= {};
       for (const [target, region] of Object.entries(next.regions)) {
-        query.regions[target] = {
-          ...(query.regions[target] || {}),
-          ...region
-        };
+        query.regions[target] = mergeDeep(
+          query.regions[target] || {},
+          region
+        );
       }
     }
 
@@ -119,10 +145,10 @@ export function mergeSemanticQueries(base, extra) {
   if (extra.regions) {
     merged.regions ??= {};
     for (const [target, region] of Object.entries(extra.regions)) {
-      merged.regions[target] = {
-        ...(merged.regions[target] || {}),
-        ...region
-      };
+      merged.regions[target] = mergeDeep(
+        merged.regions[target] || {},
+        region
+      );
     }
   }
 
