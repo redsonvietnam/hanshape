@@ -64,5 +64,15 @@ export const EXTENDED_COVERED_MODEL = [
     geometry: { axis: "vertical", symmetry: "vertical" },
     strokeTypes: ["horizontal", "vertical"],
     content: { strokes: 0, boundaryContact: "none" }
+  }),
+  single("乙", "yǐ", 1, {
+    topology: { connectivity: "connected", junction: 0 },
+    geometry: { curvature: "curved" },
+    strokeTypes: ["curve"]
+  }),
+  single("十", "shí", 2, {
+    topology: { connectivity: "connected", junction: 1, crossing: true },
+    geometry: { axis: "vertical", symmetry: "vertical" },
+    strokeTypes: ["horizontal", "vertical"]
   })
 ];
