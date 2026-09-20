@@ -154,3 +154,63 @@ export function semanticRelationToToken(relation) {
 
   return null;
 }
+
+function relationQueryFromParts(target, type, value, a, b) {
+  return {
+    relations: [{
+      target,
+      type,
+      ...(a ? { a } : {}),
+      ...(b ? { b } : {}),
+      value
+    }]
+  };
+}
+
+export function parseGenericRelationToken(token) {
+  const raw = String(token ?? "").trim();
+  const match = /^rel\(([^,]+),([^\)]+)\)(?:=)([^]+)$/.exec(raw);
+  if (!match) return null;
+
+  const ref = parseRef(match[1]);
+  const type = match[2].trim();
+  const valueRaw = match[3].trim();
+  const value = valueRaw === "true"
+    ? true
+    : valueRaw === "false"
+      ? false
+      : /^[A-Z_]+$/.test(valueRaw)
+        ? valueRaw.toLowerCase()
+        : valueRaw;
+
+  if (!ref || !type || value === "") return null;
+
+  return {
+    kind: "generic-relation",
+    raw,
+    target: ref.target,
+    type,
+    path: ref.name,
+    value
+  };
+}
+
+export function genericRelationTokenToSemanticQuery(token) {
+  const parsed = typeof token === "string"
+    ? parseGenericRelationToken(token)
+    : token;
+  if (!parsed) return null;
+
+  return relationQueryFromParts(
+    parsed.target,
+    parsed.type,
+    parsed.value
+  );
+}
+
+export function genericRelationTokenFromParts(target, type, value) {
+  const literal = typeof value === "string"
+    ? value
+    : String(value);
+  return "rel(" + target + ".relation," + type + ")=" + literal;
+}
