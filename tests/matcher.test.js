@@ -377,3 +377,7 @@ test("semantic relation query respects source region", () => {
     0
   );
 });
+
+test("semantic matcher returns no candidates for an invalid query", () => {
+  assert.deepEqual(matchSemantic(CHARACTER_MODEL, null), []);
+});
