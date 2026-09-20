@@ -1,4 +1,4 @@
-# HanShape Query Grammar v0.6
+# HanShape Query Grammar v0.9
 
 ## Numeric layer
 
@@ -181,3 +181,57 @@ one semantic query
         ↓
 matcher
 ```
+## Generic feature tokens
+
+Scalar/enum/numeric ontology features can be entered without waiting for a numeric digit:
+
+```text
+feat(C.geometry.symmetry)=vertical
+feat(C.topology.junction)>=3
+feat(C.content.strokes)=2
+feat(C.topology.connectivity)=disconnected
+```
+
+These compile directly to region-scoped semantic queries.
+
+### Set membership
+
+Set-valued features use `has(...)`:
+
+```text
+has(C.strokeTypes,dot)
+has(C.strokeTypes,dot)=false
+```
+
+`has(...)=false` compiles to the semantic `not` operator. Numeric bindings remain separate; these tokens are the human-readable semantic language.
+
+### Canonical path
+
+```text
+numeric token      ─┐
+relation token     ─┼→ semantic AST → matcher
+feature token      ─┤
+membership token   ─┘
+```
+
+This is the intended direction for HanShape: semantic vocabulary first, compact numeric codec second.
+## Language conformance
+
+All current user-facing token families compile into the same semantic AST:
+
+- numeric base/refinement tokens
+- relation tokens such as `len(...)`, `pos(...)`, `contact(...)`
+- scalar feature tokens `feat(...)`
+- set-membership tokens `has(...)`
+
+The numeric representation is therefore a codec, not a separate semantic language.
+### Generic relation tokens
+
+Relations without a dedicated human-readable shorthand use:
+
+```text
+rel(C.relation,parallelism)=true
+rel(C.relation,alignment)=aligned
+```
+
+The relation token is still region-scoped and compiles to the same `relations[]` semantic AST.

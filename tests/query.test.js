@@ -85,3 +85,19 @@ test("numeric parser rejects a region that the selected form does not have", () 
 test("unified query language exposes a stable research version", () => {
   assert.equal(QUERY_LANGUAGE_VERSION, "0.9");
 });
+
+test("all public token families compile into one semantic AST", () => {
+  const numeric = parseInput("35");
+  const relation = parseInput("len(C.hUpper,C.hLower)<");
+  const feature = parseInput("feat(C.content.strokes)=2");
+  const membership = parseInput("has(C.strokeTypes,dot)");
+
+  assert.equal(numeric.tokens[0].kind, "numeric");
+  assert.equal(relation.tokens[0].kind, "relation");
+  assert.equal(feature.tokens[0].kind, "feature");
+  assert.equal(membership.tokens[0].kind, "has");
+  assert.ok(numeric.query.form);
+  assert.ok(relation.query.relations);
+  assert.ok(feature.query.regions);
+  assert.ok(membership.query.regions);
+});
