@@ -12,6 +12,8 @@
     "benchmark:observation-path": "node scripts/benchmark-observation-path.js",
     "audit:frontier": "node scripts/audit-frontier.js",
     "benchmark:covered-extensions": "node scripts/benchmark-covered-extensions.js",
-    "benchmark:input-expressiveness": "node scripts/benchmark-input-expressiveness.js"
+    "benchmark:input-expressiveness": "node scripts/benchmark-input-expressiveness.js",
+    "benchmark:multivalue": "node scripts/benchmark-multivalue.js",
+    "benchmark:decision-tree": "node scripts/benchmark-decision-tree.js"
   }
 }

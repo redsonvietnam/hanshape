@@ -8,7 +8,6 @@ const group = names =>
 function summarize(rows) {
   const solved = rows.filter(row => row.optimalQuestions !== null);
   const gaps = solved.map(row => row.questionGap);
-  const entropyGaps = solved.map(row => row.entropyGap);
 
   return {
     cases: solved.length,
@@ -16,8 +15,7 @@ function summarize(rows) {
     averageOptimal: solved.reduce((sum, row) => sum + row.optimalQuestions, 0) / solved.length,
     averageQuestionGap: solved.reduce((sum, row) => sum + row.questionGap, 0) / solved.length,
     maxQuestionGap: Math.max(...gaps),
-    averageEntropyGap: solved.reduce((sum, row) => sum + row.entropyGap, 0) / solved.length,
-    optimalAtEntropyBound: entropyGaps.filter(value => value === 0).length
+    greedyMatchesOptimal: solved.filter(row => row.questionGap === 0).length
   };
 }
 
@@ -31,7 +29,8 @@ function benchmark(name, candidates) {
       group: name,
       target: target.char,
       candidates: candidates.length,
-      lowerBound: result?.lowerBound ?? null,
+      decisionTreeLowerBound: result?.decisionTreeLowerBound ?? null,
+      targetLowerBound: result?.targetLowerBound ?? null,
       optimalQuestions: result?.optimalQuestions ?? null,
       greedyQuestions: result?.greedyQuestions ?? null,
       questionGap: result?.questionGap ?? null,

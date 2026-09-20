@@ -1,3 +1,5 @@
+import { observationToSemanticQuery } from "./observation-query.js";
+
 const TARGET_DIGIT_BY_ID = {
   C: "5",
   L: "4",
@@ -122,16 +124,34 @@ export function encodeSemanticQuestion(question) {
 
   const query = question.query;
 
+  if (query.not) {
+    return {
+      supported: false,
+      reason: "not-operator-not-bound"
+    };
+  }
+
   if (Array.isArray(query.relations) && query.relations.length > 0) {
     if (
       query.relations.length === 1 &&
       query.relations[0].type === "parallelism" &&
       query.relations[0].value === true
     ) {
+      const target = query.relations[0].target ?? "C";
+      const targetDigit = TARGET_DIGIT_BY_ID[target];
+
+      if (!targetDigit) {
+        return {
+          supported: false,
+          reason: "target-not-bound",
+          target
+        };
+      }
+
       return {
         supported: true,
-        code: "0" + TARGET_DIGIT_BY_ID.C + "5",
-        target: "C",
+        code: "0" + targetDigit + "5",
+        target,
         featureDigit: "5",
         concept: "parallelism"
       };
@@ -200,4 +220,19 @@ export function encodeObservationPath(path = []) {
     encoded,
     unsupportedReasons: [...new Set(unsupported.map(item => item.reason))]
   };
+}
+
+export function encodeObservationValue(observation, value) {
+  const query = observationToSemanticQuery(observation, value);
+
+  if (!query) {
+    return {
+      supported: false,
+      reason: value === "__missing__"
+        ? "missing-value-not-bound"
+        : "observation-not-semantic"
+    };
+  }
+
+  return encodeSemanticQuestion({ query });
 }

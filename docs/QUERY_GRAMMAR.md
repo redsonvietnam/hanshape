@@ -83,3 +83,101 @@ R6  EXACT STROKE SEQUENCE (last resort)
 ```
 
 A collision at an earlier layer is valid. Refinement is expected.
+
+## Semantic negative queries
+
+The abstract semantic layer supports a top-level `not` operator:
+
+```js
+{
+  not: {
+    regions: {
+      C: { strokeTypes: ["dot"] }
+    }
+  }
+}
+```
+
+This means the observed fact is "the whole character does not contain a dot" without inventing a new ontology primitive.
+
+`not` is semantic-layer functionality. It has no numeric digit binding yet.
+
+Numeric negative syntax should be designed only after actual interaction data shows that negative observations are common enough to justify a compact encoding.
+## Relation scope
+
+Semantic relations are scoped to their source region:
+
+```js
+{
+  relations: [{
+    target: "L",
+    type: "relativeLength",
+    a: "hUpper",
+    b: "hLower",
+    value: "shorter"
+  }]
+}
+```
+
+A relation stored in `R` must not satisfy a query explicitly targeting `L`.
+
+The draft textual relation syntax uses the same scope:
+
+```text
+len(L.hUpper,L.hLower)<
+pos(C.dot,C.mainAxis)=R
+```
+## Unified input compiler
+
+Numeric and semantic relation tokens now compile into the same semantic AST.
+
+Examples:
+
+```text
+35
+```
+
+becomes:
+
+```js
+{
+  form: "SINGLE",
+  strokes: 5
+}
+```
+
+While:
+
+```text
+35 len(C.hUpper,C.hLower)<
+```
+
+becomes:
+
+```js
+{
+  form: "SINGLE",
+  strokes: 5,
+  relations: [{
+    target: "C",
+    type: "relativeLength",
+    a: "hUpper",
+    b: "hLower",
+    value: "shorter"
+  }]
+}
+```
+
+Both are passed to the same deterministic semantic matcher.
+
+Whitespace separates input tokens. This creates a progressive path without committing to a final numeric compression for relations:
+
+```text
+base numeric query
+        +
+semantic relation token
+        ↓
+one semantic query
+        ↓
+matcher
+```

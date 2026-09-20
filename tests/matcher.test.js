@@ -290,3 +290,94 @@ test("numeric parallelism binding reaches semantic matcher", () => {
   const matched = chars(matchCharacters(corpus, parsed));
   assert.deepEqual(matched, ["X"]);
 });
+
+test("semantic negative query excludes matching stroke features", () => {
+  const corpus = [{
+    char: "X",
+    form: "SINGLE",
+    strokes: 4,
+    regions: {
+      C: {
+        strokes: 4,
+        strokeTypes: ["dot"]
+      }
+    }
+  }, {
+    char: "Y",
+    form: "SINGLE",
+    strokes: 4,
+    regions: {
+      C: {
+        strokes: 4,
+        strokeTypes: ["horizontal"]
+      }
+    }
+  }];
+
+  assert.deepEqual(
+    chars(matchSemantic(corpus, {
+      not: {
+        regions: { C: { strokeTypes: ["dot"] } }
+      }
+    })),
+    ["Y"]
+  );
+});
+
+test("semantic relation query respects source region", () => {
+  const corpus = [{
+    char: "L",
+    form: "LR",
+    strokes: 4,
+    regions: {
+      L: {
+        strokes: 2,
+        relations: [{
+          type: "relativeLength",
+          a: "hUpper",
+          b: "hLower",
+          value: "shorter"
+        }]
+      },
+      R: {
+        strokes: 2,
+        relations: [{
+          type: "relativeLength",
+          a: "hUpper",
+          b: "hLower",
+          value: "longer"
+        }]
+      }
+    }
+  }];
+
+  assert.equal(
+    matchSemantic(corpus, {
+      relations: [{
+        target: "L",
+        type: "relativeLength",
+        a: "hUpper",
+        b: "hLower",
+        value: "shorter"
+      }]
+    }).length,
+    1
+  );
+
+  assert.equal(
+    matchSemantic(corpus, {
+      relations: [{
+        target: "R",
+        type: "relativeLength",
+        a: "hUpper",
+        b: "hLower",
+        value: "shorter"
+      }]
+    }).length,
+    0
+  );
+});
+
+test("semantic matcher returns no candidates for an invalid query", () => {
+  assert.deepEqual(matchSemantic(CHARACTER_MODEL, null), []);
+});

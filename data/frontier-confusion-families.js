@@ -1,1 +1,73 @@
-/**\n * Research frontier corpus for HanShape v0.9.\n *\n * Each family is deliberately tagged as either:\n *   - covered: current ontology should be able to express the key distinction\n *   - frontier: the family exposes a recurring visual distinction that is\n *              not yet a first-class concept in the current ontology.\n *\n * This file is a research inventory, not character-model ground truth.\n */\n\nexport const FRONTIER_CONFUSION_FAMILIES = [\n  {\n    id: "wang-yu-zhu-sheng",\n    chars: ["王", "玉", "主", "生"],\n    status: "covered",\n    basePattern: "SINGLE / 4-5 strokes",\n    usefulConcepts: ["strokeType", "relativePosition", "symmetry", "axis"],\n    notes: "Tests dot-bearing variants and whether the extra stroke is described by reusable stroke/position concepts."\n  },\n  {\n    id: "kou-ri-yue-mu",\n    chars: ["口", "日", "曰", "目"],\n    status: "covered",\n    basePattern: "SINGLE / enclosure family",\n    usefulConcepts: ["enclosure", "junction", "boundaryContact"],\n    notes: "Tests enclosure with increasing interior stroke counts and inner-boundary contact."\n  },\n  {\n    id: "gong-tu-shi-gan",\n    chars: ["工", "土", "士", "干"],\n    status: "covered",\n    basePattern: "SINGLE / 2-3 strokes",\n    usefulConcepts: ["relativePosition", "relativeLength", "axis", "connectivity"],\n    notes: "Tests relative placement and relative length of horizontal/vertical components."\n  },\n  {\n    id: "da-tian-fu-tai",\n    chars: ["大", "天", "夫", "太"],\n    status: "covered",\n    basePattern: "SINGLE / cross-like skeleton",\n    usefulConcepts: ["strokeType", "relativePosition", "symmetry", "convergence"],\n    notes: "Tests whether added top horizontal or dot-like strokes can be described without character-specific names."\n  },\n  {\n    id: "tian-you-jia-shen",\n    chars: ["田", "由", "甲", "申"],\n    status: "frontier",\n    basePattern: "SINGLE / box-like family",\n    usefulConcepts: ["enclosure", "boundaryContact"],\n    frontierConcepts: ["boundaryProtrusion", "axisExtension"],\n    notes: "The decisive difference is whether an internal axis protrudes beyond one or both enclosing boundaries. Current ontology has boundary contact, but not explicit boundary protrusion."\n  },\n  {\n    id: "ji-yi-si",\n    chars: ["己", "已", "巳"],\n    status: "frontier",\n    basePattern: "SINGLE / 3-stroke hooked family",\n    usefulConcepts: ["curvature", "connectivity", "convergence"],\n    frontierConcepts: ["openDirection", "endpointTopology"],\n    notes: "The important visual distinction is the shape/opening direction of the hooked stroke system; current ontology does not directly encode endpoint topology."\n  },\n  {\n    id: "shi-qian-gan",\n    chars: ["十", "千", "干"],\n    status: "frontier",\n    basePattern: "SINGLE / cross-like skeleton",\n    usefulConcepts: ["relativePosition", "axis", "strokeType"],\n    frontierConcepts: ["strokeOrdering", "intersectionOffset"],\n    notes: "The extra or displaced horizontal/diagonal relation can depend on which stroke crosses or extends beyond the main axis; current model has crossing and position, but not stroke-identity/order as a first-class observation."\n  }\n];\n
+/**
+ * Research frontier corpus for HanShape v0.9.
+ *
+ * Each family is deliberately tagged as either:
+ *   - covered: current ontology should be able to express the key distinction
+ *   - frontier: the family exposes a recurring visual distinction that is
+ *              not yet a first-class concept in the current ontology.
+ *
+ * This file is a research inventory, not character-model ground truth.
+ */
+
+export const FRONTIER_CONFUSION_FAMILIES = [
+  {
+    id: "wang-yu-zhu-sheng",
+    chars: ["王", "玉", "主", "生"],
+    status: "covered",
+    basePattern: "SINGLE / 4-5 strokes",
+    usefulConcepts: ["strokeType", "relativePosition", "symmetry", "axis"],
+    notes: "Tests dot-bearing variants and whether the extra stroke is described by reusable stroke/position concepts."
+  },
+  {
+    id: "kou-ri-yue-mu",
+    chars: ["口", "日", "曰", "目"],
+    status: "covered",
+    basePattern: "SINGLE / enclosure family",
+    usefulConcepts: ["enclosure", "junction", "boundaryContact"],
+    notes: "Tests enclosure with increasing interior stroke counts and inner-boundary contact."
+  },
+  {
+    id: "gong-tu-shi-gan",
+    chars: ["工", "土", "士", "干"],
+    status: "frontier",
+    basePattern: "SINGLE / 2-3 strokes",
+    usefulConcepts: ["relativePosition", "relativeLength", "axis", "connectivity"],
+    frontierConcepts: ["axisExtension"],
+    notes: "土 / 士 are covered by relative length, but 干 introduces the recurring question of whether the main axis extends beyond a component boundary."
+  },
+  {
+    id: "da-tian-fu-tai",
+    chars: ["大", "天", "夫", "太"],
+    status: "covered",
+    basePattern: "SINGLE / cross-like skeleton",
+    usefulConcepts: ["strokeType", "relativePosition", "symmetry", "convergence"],
+    notes: "Tests whether added top horizontal or dot-like strokes can be described without character-specific names."
+  },
+  {
+    id: "tian-you-jia-shen",
+    chars: ["田", "由", "甲", "申"],
+    status: "frontier",
+    basePattern: "SINGLE / box-like family",
+    usefulConcepts: ["enclosure", "boundaryContact"],
+    frontierConcepts: ["boundaryProtrusion", "axisExtension"],
+    notes: "The decisive difference is whether an internal axis protrudes beyond one or both enclosing boundaries. Current ontology has boundary contact, but not explicit boundary protrusion."
+  },
+  {
+    id: "ji-yi-si",
+    chars: ["己", "已", "巳"],
+    status: "frontier",
+    basePattern: "SINGLE / 3-stroke hooked family",
+    usefulConcepts: ["curvature", "connectivity", "convergence"],
+    frontierConcepts: ["openDirection", "endpointTopology"],
+    notes: "The important visual distinction is the shape/opening direction of the hooked stroke system; current ontology does not directly encode endpoint topology."
+  },
+  {
+    id: "shi-qian-gan",
+    chars: ["十", "千", "干"],
+    status: "frontier",
+    basePattern: "SINGLE / cross-like skeleton",
+    usefulConcepts: ["relativePosition", "axis", "strokeType"],
+    frontierConcepts: ["strokeOrdering", "intersectionOffset"],
+    notes: "The extra or displaced horizontal/diagonal relation can depend on which stroke crosses or extends beyond the main axis; current model has crossing and position, but not stroke-identity/order as a first-class observation."
+  }
+];

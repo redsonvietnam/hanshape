@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { encodeSemanticQuestion, encodeObservationPath } from "../src/query-encoding.js";
+import { encodeSemanticQuestion, encodeObservationPath, encodeObservationValue } from "../src/query-encoding.js";
 
 test("numeric encoder maps enclosure to the existing refinement namespace", () => {
   const result = encodeSemanticQuestion({
@@ -58,4 +58,36 @@ test("path encoding reports coverage instead of silently losing observations", (
   assert.equal(result.unsupported, 1);
   assert.equal(result.coverage, 0.5);
   assert.ok(result.unsupportedReasons.includes("relation-not-bound"));
+});
+
+test("numeric expressiveness audit accepts supported multivalue facts", () => {
+  const result = encodeObservationValue({
+    kind: "region",
+    target: "C",
+    path: ["topology", "enclosure"]
+  }, true);
+
+  assert.equal(result.supported, true);
+  assert.equal(result.code, "050");
+});
+
+test("numeric expressiveness audit reports unbound multivalue relations", () => {
+  const result = encodeObservationValue({
+    kind: "relation",
+    relationKey: "relativeLength|hUpper|hLower"
+  }, "shorter");
+
+  assert.equal(result.supported, false);
+  assert.equal(result.reason, "relation-not-bound");
+});
+
+test("numeric expressiveness audit reports unsupported negative observations", () => {
+  const result = encodeObservationValue({
+    kind: "strokeType",
+    target: "C",
+    path: ["dot"]
+  }, false);
+
+  assert.equal(result.supported, false);
+  assert.equal(result.reason, "not-operator-not-bound");
 });

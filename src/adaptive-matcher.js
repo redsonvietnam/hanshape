@@ -215,6 +215,7 @@ function collectQuestions(candidates) {
       for (const relation of source.relations || []) {
         const query = {
           relations: [{
+            target,
             type: relation.type,
             a: relation.a,
             b: relation.b,
@@ -226,9 +227,13 @@ function collectQuestions(candidates) {
         const b = REF_LABELS[relation.b] ?? relation.b;
         const value = VALUE_LABELS[relation.value] ?? relation.value;
 
-        let label = `${a} so với ${b}: ${value}`;
-        if (relation.type === "relativePosition") label = `${a} nằm ${value} so với ${b}?`;
-        if (relation.type === "relativeLength") label = `${a} ${value} ${b}?`;
+        let label = `${TARGET_LABELS[target]}: ${a} so với ${b}: ${value}`;
+        if (relation.type === "relativePosition") {
+          label = `${TARGET_LABELS[target]}: ${a} nằm ${value} so với ${b}?`;
+        }
+        if (relation.type === "relativeLength") {
+          label = `${TARGET_LABELS[target]}: ${a} ${value} ${b}?`;
+        }
 
         add(makeQuestion(
           JSON.stringify(query),

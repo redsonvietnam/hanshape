@@ -24,6 +24,8 @@ A partial query is valid. Collisions are expected. Refinement narrows the candid
 - `src/matcher.js` — abstract query → candidates
 - `src/adaptive-matcher.js` — candidate set → next best visual observation
 - `src/observation-path.js` — exact target-specific minimal observation paths
+- `src/relation-token.js` — executable region-scoped relation token draft
+- `src/query.js` — unified numeric + semantic input compiler
 - `data/adversarial-corpus.js` — adversarial groups
 - `tests/matcher.test.js` — deterministic matcher tests
 - `tests/adaptive-matcher.test.js` — adaptive question tests
@@ -84,6 +86,8 @@ The adaptive matcher is now paired with an exact target-specific observation-pat
 
 The next layer measures a separate **input expressiveness gap**: whether those semantic observations can actually be encoded by the current numeric grammar. See `docs/INPUT_EXPRESSIVENESS.md` and run `npm run benchmark:input-expressiveness`.
 
+The adaptive research layer now also tests multi-value observations and a semantic `not` operator so an observed value can flow back through the same matcher instead of creating a second matching system.
+
 Run the benchmark with:
 
 ```bash
@@ -97,3 +101,7 @@ The adaptive demo remains a laboratory/debugging tool rather than the final HanS
 ## Status
 
 Research prototype. The next bottlenecks are corpus coverage, input expressiveness, and human observation cost—not deeper lookahead by itself.
+
+## Unified input path
+
+Numeric and semantic relation tokens are compiled into one semantic AST before matching. This keeps numeric bindings as a codec layer instead of creating separate matching semantics.

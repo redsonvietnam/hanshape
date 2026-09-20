@@ -141,7 +141,8 @@ export function minimumObservationPath(candidates, targetChar, options = {}) {
   return {
     targetChar,
     candidateCount: candidates.length,
-    lowerBound: Math.ceil(Math.log2(candidates.length)),
+    decisionTreeLowerBound: Math.ceil(Math.log2(candidates.length)),
+    targetLowerBound: candidates.length > 1 ? 1 : 0,
     ...result,
     statesExplored: memo.size
   };
@@ -183,7 +184,8 @@ export function simulateGreedyObservationPath(candidates, targetChar, options = 
     candidateCount: candidates.length,
     questions: path.length,
     cost,
-    lowerBound: Math.ceil(Math.log2(candidates.length)),
+    decisionTreeLowerBound: Math.ceil(Math.log2(candidates.length)),
+    targetLowerBound: candidates.length > 1 ? 1 : 0,
     path,
     remaining: remaining.map(candidate => candidate.char)
   };
@@ -198,11 +200,11 @@ export function compareObservationPaths(candidates, targetChar, options = {}) {
   return {
     targetChar,
     candidateCount: candidates.length,
-    lowerBound: optimal.lowerBound,
+    decisionTreeLowerBound: optimal.decisionTreeLowerBound,
+    targetLowerBound: optimal.targetLowerBound,
     optimalQuestions: optimal.questions,
     greedyQuestions: greedy.questions,
     questionGap: greedy.questions - optimal.questions,
-    entropyGap: greedy.questions - optimal.lowerBound,
     optimalCost: optimal.cost,
     greedyCost: greedy.cost,
     costGap: greedy.cost - optimal.cost,

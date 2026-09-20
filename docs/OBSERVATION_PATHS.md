@@ -16,25 +16,16 @@ This is a **benchmarking tool**, not a replacement for the user interface.
 
 The greedy adaptive matcher may choose a reasonable next observation while still taking more observations than the best path available in the same ontology.
 
-We therefore measure three quantities:
+We distinguish two different bounds:
 
 ```text
-entropy lower bound
-        ↓
-best path available in current ontology
-        ↓
-current greedy adaptive path
+worst-case decision-tree lower bound = ceil(log2(n))
+target-specific path lower bound   = 1 for n > 1
 ```
 
-For `n` equally likely candidates, any binary strategy needs at least:
+The first applies to the maximum depth of a complete binary decision tree. The second is the only generally valid information-free lower bound for one known target's branch.
 
-```text
-ceil(log2(n))
-```
-
-observations in the ideal balanced case.
-
-The exact observation-path solver then searches the existing question space to determine whether the current ontology and question generator can actually achieve that bound for a target.
+The exact target-specific solver therefore measures path length directly. It does not claim that a target path must be at least ceil(log2(n)) observations.
 
 ## API
 
@@ -47,7 +38,8 @@ minimumObservationPath(candidates, "未");
 Returns:
 
 - `questions` — minimum number of observations found
-- `lowerBound` — information-theoretic binary lower bound
+- `decisionTreeLowerBound` — worst-case binary decision-tree lower bound
+- `targetLowerBound` — trivial target-specific lower bound (0 for singleton, otherwise 1)
 - `path` — the semantic questions used
 - `statesExplored` — number of candidate states explored by the exact search
 
@@ -69,7 +61,6 @@ Returns the gap between the greedy and optimal paths:
 
 ```text
 questionGap = greedyQuestions - optimalQuestions
-entropyGap  = greedyQuestions - lowerBound
 ```
 
 ## Important interpretation
@@ -77,8 +68,6 @@ entropyGap  = greedyQuestions - lowerBound
 A zero `questionGap` does **not** prove that the final HanShape input language is easy to use.
 
 It only proves that the current semantic question generator contains a path of the same length as the greedy policy.
-
-Likewise, a positive `entropyGap` does not automatically mean the ontology is wrong. It may simply mean the available observations do not form balanced partitions for that candidate family.
 
 The next research layer is therefore:
 
@@ -105,7 +94,7 @@ The benchmark covers:
 - the six adversarial groups
 - the complete 19-character semantic model
 
-The output reports the average greedy path length, average optimal path length, question gap, entropy gap, and search states explored.
+The output reports average greedy path length, average optimal path length, question gap, and search states explored.
 
 ## Research rule
 
