@@ -84,3 +84,28 @@ user answers
 ```
 
 The latter remains useful as a simulator and as a diagnostic tool.
+
+## Observation to query
+
+`src/observation-query.js` converts a selected observation value into the same semantic query format consumed by `matchSemantic`.
+
+Examples:
+
+- enclosure = true → a normal region predicate
+- dot = true → a stroke-type predicate
+- dot = false → a semantic `not` query
+- relativeLength = shorter → a relation predicate
+
+This keeps the architecture single-path:
+
+```text
+user observation
+      ↓
+observed value
+      ↓
+semantic query
+      ↓
+same deterministic matcher
+```
+
+The `not` operator exists at the semantic layer first. It does not receive a numeric digit automatically.
