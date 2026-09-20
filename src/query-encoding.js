@@ -192,6 +192,20 @@ export function encodeSemanticQuestion(question) {
   const query = question.query;
 
   if (Array.isArray(query.relations) && query.relations.length > 0) {
+    if (
+      query.relations.length === 1 &&
+      query.relations[0].type === "parallelism" &&
+      query.relations[0].value === true
+    ) {
+      return {
+        supported: true,
+        code: "0" + TARGET_DIGIT_BY_ID.C + "5",
+        target: "C",
+        featureDigit: "5",
+        concept: "parallelism"
+      };
+    }
+
     return {
       supported: false,
       reason: "relation-not-bound",
