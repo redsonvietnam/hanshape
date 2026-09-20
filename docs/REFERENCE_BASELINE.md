@@ -63,3 +63,8 @@ On a deterministic sample of 512 five-character SINGLE subsets:
 - no sampled subset had a greedy tree-depth gap.
 
 This suggests that additional lookahead is not currently the main optimization target. Corpus expansion and input expressiveness remain more valuable.
+## Bound interpretation correction
+
+The target-specific observation-path solver does not use `ceil(log2(n))` as a lower bound for an individual target branch. That quantity belongs to worst-case complete binary decision trees.
+
+The target-specific benchmark now reports direct path length and greedy-vs-optimal gap. The target-agnostic decision-tree benchmark remains the place to compare complete-tree depth.
