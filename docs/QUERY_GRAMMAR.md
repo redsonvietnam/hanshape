@@ -83,3 +83,23 @@ R6  EXACT STROKE SEQUENCE (last resort)
 ```
 
 A collision at an earlier layer is valid. Refinement is expected.
+
+## Semantic negative queries
+
+The abstract semantic layer supports a top-level `not` operator:
+
+```js
+{
+  not: {
+    regions: {
+      C: { strokeTypes: ["dot"] }
+    }
+  }
+}
+```
+
+This means the observed fact is "the whole character does not contain a dot" without inventing a new ontology primitive.
+
+`not` is semantic-layer functionality. It has no numeric digit binding yet.
+
+Numeric negative syntax should be designed only after actual interaction data shows that negative observations are common enough to justify a compact encoding.
