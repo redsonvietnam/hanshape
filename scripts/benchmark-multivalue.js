@@ -298,7 +298,7 @@ for (const names of ADVERSARIAL_GROUPS) {
     const result = compareMultivalueObservationPaths(candidates, target.char);
     if (!result) continue;
 
-    for (const observation of result.multiOptimalPath) {
+    for (const observation of result.optimalPath) {
       const value = observationValueForTarget(target, observation);
       const encoded = encodeObservationValue(observation, value);
       addDemand(observationConcept(observation), encoded.supported);
