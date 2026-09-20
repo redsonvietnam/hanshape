@@ -1,4 +1,4 @@
-# HanShape Query Grammar v0.6
+# HanShape Query Grammar v0.9
 
 ## Numeric layer
 
@@ -215,3 +215,13 @@ membership token   ─┘
 ```
 
 This is the intended direction for HanShape: semantic vocabulary first, compact numeric codec second.
+## Language conformance
+
+All current user-facing token families compile into the same semantic AST:
+
+- numeric base/refinement tokens
+- relation tokens such as `len(...)`, `pos(...)`, `contact(...)`
+- scalar feature tokens `feat(...)`
+- set-membership tokens `has(...)`
+
+The numeric representation is therefore a codec, not a separate semantic language.
