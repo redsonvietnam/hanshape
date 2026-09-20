@@ -106,3 +106,16 @@ test("adaptive matcher — deeper lookahead remains bounded by available informa
   assert.ok(question.expectedInformationGain <= maximumInformation + 1e-12);
   assert.ok(question.expectedCost >= question.cost);
 });
+
+test("adaptive matcher — flat cost mode removes hand-tuned cost bias", () => {
+  const candidates = group("木", "未", "太", "犬");
+
+  const weighted = chooseNextQuestion(candidates, { costMode: "weighted" });
+  const flat = chooseNextQuestion(candidates, { costMode: "flat" });
+
+  assert.ok(weighted);
+  assert.ok(flat);
+  assert.equal(flat.recognitionCost, 1);
+  assert.equal(flat.score, flat.informationGain);
+  assert.equal(weighted.recognitionCost, weighted.cost);
+});
