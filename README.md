@@ -25,6 +25,7 @@ A partial query is valid. Collisions are expected. Refinement narrows the candid
 - `src/adaptive-matcher.js` — candidate set → next best visual observation
 - `src/observation-path.js` — exact target-specific minimal observation paths
 - `src/relation-token.js` — executable region-scoped relation token draft
+- `src/query.js` — unified numeric + semantic input compiler
 - `data/adversarial-corpus.js` — adversarial groups
 - `tests/matcher.test.js` — deterministic matcher tests
 - `tests/adaptive-matcher.test.js` — adaptive question tests
@@ -100,3 +101,7 @@ The adaptive demo remains a laboratory/debugging tool rather than the final HanS
 ## Status
 
 Research prototype. The next bottlenecks are corpus coverage, input expressiveness, and human observation cost—not deeper lookahead by itself.
+
+## Unified input path
+
+Numeric and semantic relation tokens are compiled into one semantic AST before matching. This keeps numeric bindings as a codec layer instead of creating separate matching semantics.
