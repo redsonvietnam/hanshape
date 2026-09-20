@@ -109,3 +109,20 @@ same deterministic matcher
 ```
 
 The `not` operator exists at the semantic layer first. It does not receive a numeric digit automatically.
+## Binding demand
+
+Every exact multi-value path is also passed through the numeric input encoder.
+
+This produces a separate demand table:
+
+```text
+semantic concept
+    ↓
+how often it appears in a useful path
+    ↓
+already numerically expressible?
+```
+
+This is deliberately different from concept frequency in the whole ontology. A concept that appears often but never helps identify a target does not automatically deserve a digit.
+
+The current benchmark prints this table after the structural comparison.
