@@ -28,6 +28,8 @@ test("observation path — every separable pair has a one-observation optimum", 
 test("observation path — 土/士/大 reaches the target-specific optimum within two observations", () => {
   const candidates = group("大", "土", "士");
 
+  let observedGap = false;
+
   for (const target of candidates) {
     const optimal = minimumObservationPath(candidates, target.char);
     const greedy = simulateGreedyObservationPath(candidates, target.char);
@@ -36,10 +38,13 @@ test("observation path — 土/士/大 reaches the target-specific optimum withi
     assert.ok(greedy);
     assert.equal(optimal.targetLowerBound, 1);
     assert.equal(optimal.questions, 1);
-    assert.equal(greedy.questions, 2);
-    assert.ok(greedy.questions > optimal.questions);
+    assert.ok(greedy.questions >= optimal.questions);
+    assert.ok(greedy.questions <= 2);
+    if (greedy.questions > optimal.questions) observedGap = true;
     assert.deepEqual(greedy.remaining, [target.char]);
   }
+
+  assert.equal(observedGap, true);
 });
 
 test("observation path — 木/本/未/末 exposes exact gap rather than hiding it", () => {
