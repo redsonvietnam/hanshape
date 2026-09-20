@@ -1,6 +1,6 @@
 {
   "name": "hanshape",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,5 +16,6 @@
     "benchmark:multivalue": "node scripts/benchmark-multivalue.js",
     "benchmark:decision-tree": "node scripts/benchmark-decision-tree.js",
     "check:demo": "node --check demo/demo.js && node --check demo/query-lab.js && node --check demo/server.js"
-  }
+  },
+  "description": "HanShape semantic visual query language research prototype"
 }
