@@ -99,3 +99,37 @@ The proxy is useful for only two questions at this stage:
 - Does the relative advantage of multi-value observations survive when observations are not assumed equally difficult?
 
 The next step after this benchmark is actual human timing and error data from representative users. Those measurements should eventually replace the heuristic weights rather than being forced to fit them.
+
+
+## Human Study Lab
+
+The repository also includes a local-only browser instrument:
+
+`/demo/study-lab.html`
+
+A task:
+
+1. chooses one SINGLE character as the target;
+2. shows only the target glyph and basic metadata;
+3. starts with the full SINGLE corpus as the candidate set;
+4. shows the same multi-value observation guidance used by the research engine;
+5. hides candidate-character lists from the value buttons so the UI does not reveal the answer through the partition;
+6. records observation choice, latency, candidate count before/after, and whether the target was excluded;
+7. stops the timer when the target is isolated;
+8. exports one JSON session when the user presses Export JSON.
+
+No telemetry or network upload is implemented. The JSON remains local until the user explicitly exports it.
+
+The exported schema is intentionally small enough to analyze later:
+
+```text
+session_start
+    ↓
+observation_select × N
+    ↓
+complete
+```
+
+This instrument is the bridge from heuristic weights to empirical data. The heuristic cost table should eventually be replaced or recalibrated using these measured observations rather than treated as ground truth.
+
+For privacy, keep exported study files local and do not include names, account identifiers, or other personal information in the study payload.
