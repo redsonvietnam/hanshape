@@ -225,9 +225,12 @@ test("明/林/朋/服", () => {
   assert.deepEqual(chars(matchSemantic(corpus, {
     form: "LR",
     regions: {
-      L: { topology: { enclosure: false } },
-      R: { topology: { enclosure: false }, geometry: { symmetry: "vertical" } },
-      L: { content: null }
+      L: { topology: { enclosure: false }, content: null },
+      R: {
+        topology: { enclosure: false },
+        geometry: { symmetry: "vertical" },
+        content: null
+      }
     }
   })), ["林"]);
 });
