@@ -2,8 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   parseRelationToken,
-  relationTokenToSemanticQuery
-  semanticRelationToToken\n} from "../src/relation-token.js";
+  relationTokenToSemanticQuery,
+  semanticRelationToToken
+} from "../src/relation-token.js";
 
 test("relation token parses relative length", () => {
   assert.deepEqual(
