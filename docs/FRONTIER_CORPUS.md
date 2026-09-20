@@ -29,13 +29,13 @@ The corpus currently includes:
 
 - 王 / 玉 / 主 / 生
 - 口 / 日 / 曰 / 目
-- 工 / 土 / 士 / 干
 - 大 / 天 / 夫 / 太
 - 田 / 由 / 甲 / 申
+- 工 / 土 / 士 / 干
 - 己 / 已 / 巳
 - 十 / 千 / 干
 
-The first four are intended as covered tests; the last three are deliberate ontology-frontier probes.
+Three families are currently treated as covered hypotheses; two of them have experimental semantic annotations and pairwise tests in this branch. Four families are deliberate ontology-frontier probes.
 
 ## Research loop
 
