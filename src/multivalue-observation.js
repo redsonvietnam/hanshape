@@ -1,5 +1,6 @@
 import { matchSemantic } from "./matcher.js";
 import { observationToSemanticQuery } from "./observation-query.js";
+import { observationCost } from "./effort-model.js";
 
 
 const TARGETS = ["C", "L", "R", "T", "B", "O", "I"];
@@ -225,7 +226,7 @@ function partitionCandidates(candidates, observation) {
   return partitions;
 }
 
-function scoreObservation(observation, candidates) {
+function scoreObservation(observation, candidates, options = {}) {
   if (candidates.length < 2) return null;
 
   const partitions = partitionCandidates(candidates, observation);
@@ -240,12 +241,16 @@ function scoreObservation(observation, candidates) {
     ...[...partitions.values()].map(partition => partition.length)
   );
 
+  const cost = observationCost(observation, options);
+
   return {
     ...observation,
     candidateCount: candidates.length,
     informationGain,
     expectedRemaining: largestPartition,
     eliminationRatio: 1 - largestPartition / candidates.length,
+    observationCost: cost,
+    effortScore: informationGain / cost,
     partitionValues: [...partitions.entries()].map(([value, branch]) => ({
       value,
       candidates: branch.map(candidate => candidate.char)
@@ -274,9 +279,10 @@ export function rankAdaptiveObservations(candidates, options = {}) {
   const limit = options.limit ?? 5;
 
   return collectObservations(candidates)
-    .map(observation => scoreObservation(observation, candidates))
+    .map(observation => scoreObservation(observation, candidates, options))
     .filter(Boolean)
     .sort((a, b) =>
+      b.effortScore - a.effortScore ||
       b.informationGain - a.informationGain ||
       a.expectedRemaining - b.expectedRemaining ||
       a.label.localeCompare(b.label)
@@ -300,13 +306,15 @@ export function applyObservationAnswer(candidates, observation, value) {
   );
 }
 
-function solveMinimumPath(candidates, targetChar, memo) {
-  const key = candidateKey(candidates);
+function solveMinimumPath(candidates, targetChar, memo, options = {}) {
+  const costMode = options.costMode ?? "flat";
+  const key = `${costMode}:${candidateKey(candidates)}`;
   if (memo.has(key)) return memo.get(key);
 
   if (candidates.length === 1) {
     const terminal = {
       questions: 0,
+      cost: 0,
       path: [],
       remaining: [targetChar]
     };
@@ -328,47 +336,51 @@ function solveMinimumPath(candidates, targetChar, memo) {
 
     if (!branch.length || branch.length === candidates.length) continue;
 
-    if (best && best.questions === 1) break;
+    if (costMode === "flat" && best && best.questions === 1) break;
 
-    const child = solveMinimumPath(branch, targetChar, memo);
+    const child = solveMinimumPath(branch, targetChar, memo, options);
     if (!child) continue;
 
+    const cost = observationCost(observation, options);
     const candidate = {
       questions: 1 + child.questions,
+      cost: cost + child.cost,
       path: [observation, ...child.path],
       remaining: child.remaining
     };
 
-    best = comparePlans(candidate, best);
+    best = comparePlans(candidate, best, costMode);
   }
 
   memo.set(key, best);
   return best;
 }
 
-export function minimumMultivalueObservationPath(candidates, targetChar) {
+export function minimumMultivalueObservationPath(candidates, targetChar, options = {}) {
   if (!Array.isArray(candidates) || candidates.length === 0) return null;
   if (!candidates.some(candidate => candidate.char === targetChar)) return null;
 
-  const result = solveMinimumPath([...candidates], targetChar, new Map());
+  const result = solveMinimumPath([...candidates], targetChar, new Map(), options);
   if (!result) return null;
 
   return {
     targetChar,
     candidateCount: candidates.length,
+    costMode: options.costMode ?? "flat",
     ...result
   };
 }
 
-export function simulateGreedyMultivaluePath(candidates, targetChar) {
+export function simulateGreedyMultivaluePath(candidates, targetChar, options = {}) {
   if (!Array.isArray(candidates) || candidates.length === 0) return null;
   if (!candidates.some(candidate => candidate.char === targetChar)) return null;
 
   let remaining = [...candidates];
   const path = [];
+  let cost = 0;
 
   while (remaining.length > 1) {
-    const observation = chooseNextObservation(remaining);
+    const observation = chooseNextObservation(remaining, options);
     if (!observation) return null;
 
     const target = remaining.find(candidate => candidate.char === targetChar);
@@ -377,20 +389,23 @@ export function simulateGreedyMultivaluePath(candidates, targetChar) {
     const value = readObservationValue(target, observation);
     remaining = applyObservationAnswer(remaining, observation, value);
     path.push(observation);
+    cost += observationCost(observation, options);
   }
 
   return {
     targetChar,
     candidateCount: candidates.length,
+    costMode: options.costMode ?? "flat",
     questions: path.length,
+    cost,
     path,
     remaining: remaining.map(candidate => candidate.char)
   };
 }
 
-export function compareMultivalueObservationPaths(candidates, targetChar) {
-  const optimal = minimumMultivalueObservationPath(candidates, targetChar);
-  const greedy = simulateGreedyMultivaluePath(candidates, targetChar);
+export function compareMultivalueObservationPaths(candidates, targetChar, options = {}) {
+  const optimal = minimumMultivalueObservationPath(candidates, targetChar, options);
+  const greedy = simulateGreedyMultivaluePath(candidates, targetChar, options);
 
   if (!optimal || !greedy) return null;
 
@@ -400,6 +415,9 @@ export function compareMultivalueObservationPaths(candidates, targetChar) {
     optimalQuestions: optimal.questions,
     greedyQuestions: greedy.questions,
     questionGap: greedy.questions - optimal.questions,
+    optimalCost: optimal.cost,
+    greedyCost: greedy.cost,
+    costGap: greedy.cost - optimal.cost,
     optimalPath: optimal.path,
     greedyPath: greedy.path,
     optimalRemaining: optimal.remaining,
