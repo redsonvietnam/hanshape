@@ -105,3 +105,16 @@ Research prototype. The next bottlenecks are corpus coverage, input expressivene
 ## Unified input path
 
 Numeric and semantic relation tokens are compiled into one semantic AST before matching. This keeps numeric bindings as a codec layer instead of creating separate matching semantics.
+
+## Direct Query Lab
+
+The repository now includes a direct semantic query laboratory at `/demo/query-lab.html`.
+
+It demonstrates:
+
+- numeric input and relation-token input compiling into one semantic query;
+- candidate-set filtering through the deterministic matcher;
+- multi-value observation guidance;
+- selecting an observed value without forcing it through a YES/NO interaction.
+
+The existing adaptive demo remains a diagnostic simulator for the binary question model.
