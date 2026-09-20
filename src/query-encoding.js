@@ -1,3 +1,5 @@
+import { observationToSemanticQuery } from "./observation-query.js";
+
 const TARGET_DIGIT_BY_ID = {
   C: "5",
   L: "4",
@@ -200,4 +202,19 @@ export function encodeObservationPath(path = []) {
     encoded,
     unsupportedReasons: [...new Set(unsupported.map(item => item.reason))]
   };
+}
+
+export function encodeObservationValue(observation, value) {
+  const query = observationToSemanticQuery(observation, value);
+
+  if (!query) {
+    return {
+      supported: false,
+      reason: value === "__missing__"
+        ? "missing-value-not-bound"
+        : "observation-not-semantic"
+    };
+  }
+
+  return encodeSemanticQuestion({ query });
 }
