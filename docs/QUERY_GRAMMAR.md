@@ -225,3 +225,13 @@ All current user-facing token families compile into the same semantic AST:
 - set-membership tokens `has(...)`
 
 The numeric representation is therefore a codec, not a separate semantic language.
+### Generic relation tokens
+
+Relations without a dedicated human-readable shorthand use:
+
+```text
+rel(C.relation,parallelism)=true
+rel(C.relation,alignment)=aligned
+```
+
+The relation token is still region-scoped and compiles to the same `relations[]` semantic AST.
