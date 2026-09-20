@@ -4,7 +4,7 @@ A visual/morphological input method for Han characters.
 
 ## Current direction
 
-HanShape is not intended to be a fixed per-character code like traditional mnemonic input systems. It is a progressive visual query language:
+HanShape is a progressive visual query language rather than a fixed per-character mnemonic code.
 
 ```
 FORM → REGION → STROKE COUNT → FEATURE → RELATION
@@ -14,23 +14,24 @@ A partial query is valid. Collisions are expected. Refinement narrows the candid
 
 ## v0.6 architecture
 
-- `docs/FEATURE_ONTOLOGY.md` — feature concepts
-- `docs/QUERY_GRAMMAR.md` — query syntax
-- `src/concepts.js` — feature ontology
-- `src/digit-binding.js` — human digit bindings
-- `src/character-model.js` — morphology data model
-- `src/parser.js` — code → abstract query
+- `docs/FEATURE_ONTOLOGY.md` — primitive concepts and review findings
+- `docs/QUERY_GRAMMAR.md` — numeric and abstract query grammar
+- `src/concepts.js` — ontology
+- `src/digit-binding.js` — input bindings only
+- `src/character-model.js` — semantic morphology corpus
+- `src/parser.js` — digits → abstract query
 - `src/matcher.js` — abstract query → candidates
-- `data/adversarial-corpus.js` — adversarial character groups
-- `tests/matcher.test.js` — discrimination tests
-- `prototype/index.html` — browser prototype
+- `data/adversarial-corpus.js` — adversarial groups
+- `tests/matcher.test.js` — executable discrimination tests
 
-## Design rule
+## Design rules
 
-**Feature concept and feature digit are separate layers.**
-
-A digit is an input binding, not the ontology itself.
+1. Feature concept ≠ feature digit.
+2. A digit is only an input binding.
+3. A collision is a valid partial query.
+4. Relations should be semantic before they are numeric.
+5. Do not add a primitive merely to encode one character.
 
 ## Status
 
-Research prototype. v0.6 focuses on separating ontology from input bindings and testing visual discrimination on adversarial character groups.
+Research prototype. v0.6 is an ontology stress-test, not a frozen specification.

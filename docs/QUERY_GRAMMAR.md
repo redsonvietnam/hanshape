@@ -1,46 +1,75 @@
 # HanShape Query Grammar v0.6
 
-## Layers
+## Numeric layer
+
+Existing numeric syntax remains compatible:
+
+- `844` — LR, 4 strokes + 4 strokes
+- `244` — UD, 4 + 4
+- `34` — SINGLE, 4 strokes
+- `844040` — LR 4-4, refine L by digit 0
+
+Refinement grammar:
 
 ```
-FORM → REGION → COUNT → FEATURE → RELATION
+REFINE := 0 TARGET FEATURE_DIGIT
 ```
 
-A query may stop at any layer.
+The leading `0` is an operator, not a feature concept.
 
-## Numeric compatibility syntax
+## Abstract layer
 
-Existing v0.5 examples remain valid:
+The numeric parser resolves to a semantic query:
 
-- `844` — left/right, 4 strokes + 4 strokes
-- `244` — top/bottom, 4 + 4
-- `34` — single, 4 strokes
-- `84404067` — base query plus refinement
-
-The leading `0` in a refinement is an operator:
-
-```
-0 TARGET FEATURE
-```
-
-It means REFINE, not a feature concept.
-
-## Important rule
-
-Numeric syntax is an encoding of an abstract query. The matcher must never depend directly on digit meanings.
-
-Conceptual query example:
-
-```text
-form = SINGLE
-strokes = 5
-horizontal.position = lower
+```js
+{
+  form: "LR",
+  counts: [4, 4],
+  refinements: [
+    {
+      operator: "REFINE",
+      target: "L",
+      query: {
+        path: "topology.enclosure",
+        equals: true
+      }
+    }
+  ]
+}
 ```
 
-can later receive a different numeric representation without changing the matcher.
+The matcher consumes this abstract representation. It does not need to know that enclosure happened to be assigned digit 0.
 
-## Future relation syntax
+## Relations
 
-Relations such as relativeLength, relativePosition, alignment and connectivity should first exist in the abstract query model.
+Relations are semantic-first:
 
-They should not be forced into the 0–9 digit namespace until the ontology is stable.
+```js
+{
+  form: "SINGLE",
+  strokes: 5,
+  relations: [
+    {
+      type: "relativeLength",
+      a: "hUpper",
+      b: "hLower",
+      value: "shorter"
+    }
+  ]
+}
+```
+
+Do not assign numeric bindings to relations until the relation vocabulary is stable.
+
+## Progressive resolution
+
+```
+R1  FORM
+R2  REGION
+R3  STROKE COUNT
+R4  FEATURE
+R5  RELATION
+R6  EXACT STROKE SEQUENCE (last resort)
+```
+
+A collision at an earlier layer is valid. Refinement is expected.
