@@ -18,3 +18,5 @@ jobs:
       - run: npm run benchmark:lookahead
       - run: npm run benchmark:pairs
       - run: npm run benchmark:observation-path
+      - run: npm run audit:frontier
+      - run: npm run benchmark:covered-extensions
