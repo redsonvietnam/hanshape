@@ -9,6 +9,7 @@
     "benchmark:adaptive": "node scripts/benchmark-adaptive.js",
     "benchmark:lookahead": "node scripts/benchmark-lookahead.js",
     "benchmark:pairs": "node scripts/benchmark-pairs.js",
-    "benchmark:observation-path": "node scripts/benchmark-observation-path.js"
+    "benchmark:observation-path": "node scripts/benchmark-observation-path.js",
+    "audit:frontier": "node scripts/audit-frontier.js"
   }
 }
