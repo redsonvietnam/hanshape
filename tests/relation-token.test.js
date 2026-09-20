@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { CHARACTER_MODEL } from "../src/character-model.js";
+import { matchSemantic } from "../src/matcher.js";
 import {
   parseRelationToken,
   relationTokenToSemanticQuery,
@@ -70,4 +72,37 @@ test("semantic relation token round-trips relative length", () => {
   const token = semanticRelationToToken(relation);
   assert.equal(token, "len(C.hUpper,C.hLower)<");
   assert.deepEqual(parseRelationToken(token), relation);
+});
+
+test("relation token end-to-end identifies 未", () => {
+  const query = relationTokenToSemanticQuery(
+    "len(C.hUpper,C.hLower)<"
+  );
+
+  assert.deepEqual(
+    matchSemantic(CHARACTER_MODEL, query).map(candidate => candidate.char),
+    ["未"]
+  );
+});
+
+test("relation token end-to-end identifies 犬", () => {
+  const query = relationTokenToSemanticQuery(
+    "pos(C.dot,C.mainAxis)=R"
+  );
+
+  assert.deepEqual(
+    matchSemantic(CHARACTER_MODEL, query).map(candidate => candidate.char),
+    ["犬"]
+  );
+});
+
+test("relation token end-to-end identifies 曰", () => {
+  const query = relationTokenToSemanticQuery(
+    "contact(C.content)=LEFT"
+  );
+
+  assert.deepEqual(
+    matchSemantic(CHARACTER_MODEL, query).map(candidate => candidate.char),
+    ["曰"]
+  );
 });
