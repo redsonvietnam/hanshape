@@ -75,3 +75,34 @@ test("adaptive matcher — 人/入/八 finds a high-information visual discrimin
 test("adaptive matcher — no question remains for a singleton", () => {
   assert.equal(chooseNextQuestion(group("木")), null);
 });
+
+test("adaptive matcher — lookahead depth 2 includes a conditional next question", () => {
+  const candidates = group("大", "土", "士");
+
+  const greedy = chooseNextQuestion(candidates, { lookaheadDepth: 1 });
+  const lookahead = chooseNextQuestion(candidates, { lookaheadDepth: 2 });
+
+  assert.ok(greedy);
+  assert.ok(lookahead);
+  assert.equal(greedy.lookaheadDepth, 1);
+  assert.equal(lookahead.lookaheadDepth, 2);
+
+  assert.equal(greedy.expectedInformationGain, greedy.informationGain);
+  assert.equal(greedy.expectedCost, greedy.cost);
+  assert.equal(greedy.lookaheadScore, greedy.score);
+
+  assert.ok(lookahead.expectedInformationGain > lookahead.informationGain);
+  assert.ok(lookahead.expectedCost >= lookahead.cost);
+  assert.ok(lookahead.lookaheadScore > 0);
+});
+
+test("adaptive matcher — deeper lookahead remains bounded by available information", () => {
+  const candidates = group("木", "本", "未", "末");
+
+  const question = chooseNextQuestion(candidates, { lookaheadDepth: 3 });
+  assert.ok(question);
+
+  const maximumInformation = Math.log2(candidates.length);
+  assert.ok(question.expectedInformationGain <= maximumInformation + 1e-12);
+  assert.ok(question.expectedCost >= question.cost);
+});
