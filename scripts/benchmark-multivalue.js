@@ -152,6 +152,65 @@ function combinations(items, size) {
   return result;
 }
 
+
+
+const demand = new Map();
+
+function addDemand(concept, supported) {
+  const row = demand.get(concept) ?? {
+    concept,
+    observations: 0,
+    supportedNumeric: 0,
+    unsupportedNumeric: 0
+  };
+
+  row.observations += 1;
+  if (supported) row.supportedNumeric += 1;
+  else row.unsupportedNumeric += 1;
+  demand.set(concept, row);
+}
+
+function observationConcept(observation) {
+  if (observation.kind === "relation") {
+    return observation.relationKey.split("|")[0];
+  }
+
+  if (observation.kind === "strokeType") {
+    return "strokeType";
+  }
+
+  return observation.path.at(-1);
+}
+
+function observationValueForTarget(candidate, observation) {
+  const source = observation.target === "C"
+    ? candidate.regions?.C
+    : candidate.regions?.[observation.target];
+
+  if (!source) return "__missing__";
+
+  if (observation.kind === "region") {
+    return observation.path.reduce(
+      (value, key) => value?.[key],
+      source
+    ) ?? "__missing__";
+  }
+
+  if (observation.kind === "strokeType") {
+    return source.strokeTypes?.includes(observation.path[0]) ?? false;
+  }
+
+  const relation = (source.relations || []).find(item =>
+    [
+      item.type,
+      item.a ?? "",
+      item.b ?? ""
+    ].join("|") === observation.relationKey
+  );
+
+  return relation?.value ?? "__missing__";
+}
+
 const familyRows = ADVERSARIAL_GROUPS.flatMap(names =>
   benchmarkFamily(names, "full")
 );
@@ -231,6 +290,32 @@ const failures = [
     row.multiGreedy === null
   )
 ];
+
+for (const names of ADVERSARIAL_GROUPS) {
+  const candidates = group(names);
+
+  for (const target of candidates) {
+    const result = compareMultivalueObservationPaths(candidates, target.char);
+    if (!result) continue;
+
+    for (const observation of result.multiOptimalPath) {
+      const value = observationValueForTarget(target, observation);
+      const encoded = encodeObservationValue(observation, value);
+      addDemand(observationConcept(observation), encoded.supported);
+    }
+  }
+}
+
+console.log("");
+console.log("Multi-value exact-path binding demand");
+console.log("=====================================");
+console.table(
+  [...demand.values()]
+    .sort((a, b) =>
+      b.observations - a.observations ||
+      a.concept.localeCompare(b.concept)
+    )
+);
 
 if (failures.length > 0) {
   console.error(
