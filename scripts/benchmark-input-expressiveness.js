@@ -5,23 +5,25 @@ import { encodeObservationPath } from "../src/query-encoding.js";
 
 const group = names => CHARACTER_MODEL.filter(character => names.includes(character.char));
 
-function summarize(results) {
-  const valid = results.filter(Boolean);
-  const greedy = valid.map(result => encodeObservationPath(result.greedyPath));
-  const optimal = valid.map(result => encodeObservationPath(result.optimalPath));
+function summarize(rows) {
+  const average = key =>
+    rows.length === 0
+      ? 0
+      : rows.reduce((sum, row) => sum + row[key], 0) / rows.length;
 
-  const average = rows => rows.reduce((sum, row) => sum + row.coverage, 0) / rows.length;
-  const supported = rows => rows.reduce((sum, row) => sum + row.supported, 0);
-  const total = rows => rows.reduce((sum, row) => sum + row.total, 0);
+  const greedyObservations = rows.reduce((sum, row) => sum + row.greedyQuestions, 0);
+  const optimalObservations = rows.reduce((sum, row) => sum + row.optimalQuestions, 0);
+  const greedyUnsupported = rows.reduce((sum, row) => sum + row.greedyUnsupported, 0);
+  const optimalUnsupported = rows.reduce((sum, row) => sum + row.optimalUnsupported, 0);
 
   return {
-    cases: valid.length,
-    greedyCoverage: average(greedy),
-    optimalCoverage: average(optimal),
-    greedySupported: supported(greedy),
-    greedyObservations: total(greedy),
-    optimalSupported: supported(optimal),
-    optimalObservations: total(optimal)
+    cases: rows.length,
+    greedyCoverage: average("greedyCoverage"),
+    optimalCoverage: average("optimalCoverage"),
+    greedySupported: greedyObservations - greedyUnsupported,
+    greedyObservations,
+    optimalSupported: optimalObservations - optimalUnsupported,
+    optimalObservations
   };
 }
 
@@ -51,11 +53,7 @@ console.log("========================================");
 console.table(rows);
 console.log("");
 console.log("Aggregate");
-console.table([summarize(rows.map((row, index) => ({
-  greedyPath: rows[index].greedyQuestions > 0 ? [] : [],
-  optimalPath: [],
-  ...row
-})))]);
+console.table([summarize(rows)]);
 
 const unsupportedConcepts = new Map();
 for (const names of ADVERSARIAL_GROUPS) {
