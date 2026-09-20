@@ -169,7 +169,7 @@ export function parseInputToken(token) {
   const raw = String(token ?? "").trim();
   if (!raw) return null;
 
-  if (/^\\d+$/.test(raw)) {
+  if (/^\d+$/.test(raw)) {
     const parsed = parseBase(raw);
     if (!parsed) return null;
     return {
@@ -196,7 +196,7 @@ export function parseInput(input) {
   const raw = String(input ?? "").trim();
   if (!raw) return null;
 
-  const tokens = raw.split(/\\s+/).filter(Boolean);
+  const tokens = raw.split(/\s+/).filter(Boolean);
   const parsedTokens = tokens.map(parseInputToken);
   if (parsedTokens.some(token => !token)) return null;
 
