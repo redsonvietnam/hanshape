@@ -103,3 +103,27 @@ This means the observed fact is "the whole character does not contain a dot" wit
 `not` is semantic-layer functionality. It has no numeric digit binding yet.
 
 Numeric negative syntax should be designed only after actual interaction data shows that negative observations are common enough to justify a compact encoding.
+## Relation scope
+
+Semantic relations are scoped to their source region:
+
+```js
+{
+  relations: [{
+    target: "L",
+    type: "relativeLength",
+    a: "hUpper",
+    b: "hLower",
+    value: "shorter"
+  }]
+}
+```
+
+A relation stored in `R` must not satisfy a query explicitly targeting `L`.
+
+The draft textual relation syntax uses the same scope:
+
+```text
+len(L.hUpper,L.hLower)<
+pos(C.dot,C.mainAxis)=R
+```
