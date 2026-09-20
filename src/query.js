@@ -2,6 +2,8 @@ import { matchSemantic } from "./matcher.js";
 import { parseBase } from "./parser.js";
 import { relationTokenToSemanticQuery } from "./relation-token.js";
 
+export const QUERY_LANGUAGE_VERSION = "0.9";
+
 function setNested(root, path, value) {
   let current = root;
   for (let i = 0; i < path.length - 1; i += 1) {
