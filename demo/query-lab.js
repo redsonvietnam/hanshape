@@ -16,6 +16,9 @@ const els = {
 const EXAMPLES = [
   "35",
   "35 len(C.hUpper,C.hLower)<",
+  "feat(C.content.strokes)=2",
+  "feat(C.topology.junction)>=3",
+  "has(C.strokeTypes,dot)",
   "34 pos(C.dot,C.mainAxis)=R",
   "844"
 ];
