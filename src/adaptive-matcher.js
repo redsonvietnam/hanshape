@@ -266,7 +266,11 @@ function candidateKey(candidates) {
   return candidates.map(candidate => candidate.char).sort().join("\u0000");
 }
 
-function scoreQuestion(question, candidates) {
+function effectiveCost(question, options = {}) {
+  return options.costMode === "flat" ? 1 : question.cost;
+}
+
+function scoreQuestion(question, candidates, options = {}) {
   const n = candidates.length;
   if (n < 2) return null;
 
@@ -277,10 +281,12 @@ function scoreQuestion(question, candidates) {
   const informationGain = entropy(yesProbability);
   const expectedRemaining = Math.max(yes.length, no.length);
   const eliminationRatio = 1 - expectedRemaining / n;
-  const score = informationGain / question.cost;
+  const recognitionCost = effectiveCost(question, options);
+  const score = informationGain / recognitionCost;
 
   return {
     ...question,
+    recognitionCost,
     yesCount: yes.length,
     noCount: no.length,
     candidateCount: n,
@@ -299,8 +305,8 @@ function normalizeLookaheadDepth(value) {
   return Math.max(1, Math.floor(depth));
 }
 
-function evaluatePlanQuestion(question, candidates, depth, memo) {
-  const immediate = scoreQuestion(question, candidates);
+function evaluatePlanQuestion(question, candidates, depth, memo, options = {}) {
+  const immediate = scoreQuestion(question, candidates, options);
   if (!immediate) return null;
 
   if (depth <= 1) {
@@ -308,14 +314,14 @@ function evaluatePlanQuestion(question, candidates, depth, memo) {
       ...immediate,
       lookaheadDepth: 1,
       expectedInformationGain: immediate.informationGain,
-      expectedCost: question.cost,
+      expectedCost: immediate.recognitionCost,
       lookaheadScore: immediate.score
     };
   }
 
   const { yes, no } = partitionCandidates(candidates, question);
-  const yesPlan = bestPlan(yes, depth - 1, memo);
-  const noPlan = bestPlan(no, depth - 1, memo);
+  const yesPlan = bestPlan(yes, depth - 1, memo, options);
+  const noPlan = bestPlan(no, depth - 1, memo, options);
 
   const yesProbability = yes.length / candidates.length;
   const noProbability = no.length / candidates.length;
@@ -326,7 +332,7 @@ function evaluatePlanQuestion(question, candidates, depth, memo) {
     noProbability * noPlan.expectedInformationGain;
 
   const expectedCost =
-    question.cost +
+    immediate.recognitionCost +
     yesProbability * yesPlan.expectedCost +
     noProbability * noPlan.expectedCost;
 
@@ -359,7 +365,7 @@ function betterPlan(a, b) {
   return priorityOf(a.concept) - priorityOf(b.concept) <= 0 ? a : b;
 }
 
-function bestPlan(candidates, depth, memo) {
+function bestPlan(candidates, depth, memo, options = {}) {
   if (candidates.length < 2 || depth < 1) {
     return {
       question: null,
@@ -369,12 +375,12 @@ function bestPlan(candidates, depth, memo) {
     };
   }
 
-  const key = `${depth}: ${candidateKey(candidates)}`;
+  const key = `${options.costMode ?? "weighted"}:${depth}: ${candidateKey(candidates)}`;
   if (memo.has(key)) return memo.get(key);
 
   let best = null;
   for (const question of collectQuestions(candidates)) {
-    const scored = evaluatePlanQuestion(question, candidates, depth, memo);
+    const scored = evaluatePlanQuestion(question, candidates, depth, memo, options);
     if (!scored) continue;
     best = betterPlan(scored, best);
   }
@@ -409,11 +415,13 @@ export function rankAdaptiveQuestions(candidates, options = {}) {
 
   const limit = options.limit ?? 5;
   const lookaheadDepth = normalizeLookaheadDepth(options.lookaheadDepth);
+  const costMode = options.costMode ?? "weighted";
+  const scoringOptions = { costMode };
   const memo = new Map();
 
   const scored = collectQuestions(candidates)
     .map(question =>
-      evaluatePlanQuestion(question, candidates, lookaheadDepth, memo)
+      evaluatePlanQuestion(question, candidates, lookaheadDepth, memo, scoringOptions)
     )
     .filter(Boolean);
 
