@@ -89,5 +89,5 @@ test("numeric expressiveness audit reports unsupported negative observations", (
   }, false);
 
   assert.equal(result.supported, false);
-  assert.equal(result.reason, "feature-not-bound");
+  assert.equal(result.reason, "not-operator-not-bound");
 });
