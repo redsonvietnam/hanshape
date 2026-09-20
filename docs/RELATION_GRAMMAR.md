@@ -85,3 +85,6 @@ numeric binding
 ## Current status
 
 Research draft only. This grammar is not accepted as the v0.9 public syntax yet.
+
+
+Relation queries are region-scoped. A relation observation from `L` must not satisfy the same relation stored in `R`.
