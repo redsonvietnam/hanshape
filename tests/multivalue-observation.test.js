@@ -78,3 +78,23 @@ test("multivalue observations do not invent a region for mixed forms", () => {
     false
   );
 });
+
+test("observation answers use the same semantic matcher as direct queries", () => {
+  const candidates = [
+    ...group("日", "曰", "目")
+  ];
+
+  const observation = {
+    kind: "region",
+    target: "C",
+    path: ["content", "boundaryContact"]
+  };
+
+  const value = "left";
+  const observed = applyObservationAnswer(candidates, observation, value);
+
+  assert.deepEqual(
+    observed.map(candidate => candidate.char),
+    ["曰"]
+  );
+});
