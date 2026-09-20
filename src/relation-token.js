@@ -23,7 +23,7 @@ function parseRef(ref) {
 export function parseRelationToken(token) {
   const raw = String(token ?? "").trim();
 
-  let match = /^len\\(([^,]+),([^\\)]+)\\)([<=>])$/.exec(raw);
+  let match = /^len\(([^,]+),([^\)]+)\)([<=>])$/.exec(raw);
   if (match) {
     const a = parseRef(match[1]);
     const b = parseRef(match[2]);
@@ -38,7 +38,7 @@ export function parseRelationToken(token) {
     };
   }
 
-  match = /^pos\\(([^,]+),([^\\)]+)\\)=([LRUDC])$/.exec(raw);
+  match = /^pos\(([^,]+),([^\)]+)\)=([LRUDC])$/.exec(raw);
   if (match) {
     const a = parseRef(match[1]);
     const b = parseRef(match[2]);
@@ -53,7 +53,7 @@ export function parseRelationToken(token) {
     };
   }
 
-  match = /^contact\\(([^\\)]+)\\)=([A-Z]+)$/.exec(raw);
+  match = /^contact\(([^\)]+)\)=([A-Z]+)$/.exec(raw);
   if (match) {
     const ref = parseRef(match[1]);
     if (!ref || ref.name !== "content" || !CONTACT_VALUES.has(match[2])) return null;
