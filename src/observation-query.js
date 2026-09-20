@@ -39,6 +39,7 @@ export function observationToSemanticQuery(observation, value) {
     const [type, a, b] = observation.relationKey.split("|");
     return {
       relations: [{
+        target: observation.target,
         type,
         a: a || undefined,
         b: b || undefined,
