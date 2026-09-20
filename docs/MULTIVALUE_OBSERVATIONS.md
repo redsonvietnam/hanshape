@@ -126,3 +126,10 @@ already numerically expressible?
 This is deliberately different from concept frequency in the whole ontology. A concept that appears often but never helps identify a target does not automatically deserve a digit.
 
 The current benchmark prints this table after the structural comparison.
+## Target-agnostic policy benchmark
+
+The current entropy-greedy policy was also evaluated as a complete target-agnostic decision tree against an exact optimal tree.
+
+On all 4-character SINGLE subsets in the current corpus, greedy and exact tree depth matched for both binary and multi-value observations. A deterministic sample of 512 five-character subsets showed the same result.
+
+This is stronger evidence than target-specific paths alone: the policy can be evaluated without giving the selector knowledge of the hidden target.
