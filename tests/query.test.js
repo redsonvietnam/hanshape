@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { CHARACTER_MODEL } from "../src/character-model.js";
-import { matchInput, parseInput, numericToSemanticQuery } from "../src/query.js";
+import { QUERY_LANGUAGE_VERSION, matchInput, parseInput, numericToSemanticQuery } from "../src/query.js";
 
 test("numeric input compiles to semantic query", () => {
   const parsed = parseInput("35");
@@ -80,4 +80,8 @@ test("empty or malformed input returns no candidates", () => {
 
 test("numeric parser rejects a region that the selected form does not have", () => {
   assert.equal(parseInput("3440"), null);
+});
+
+test("unified query language exposes a stable research version", () => {
+  assert.equal(QUERY_LANGUAGE_VERSION, "0.9");
 });
