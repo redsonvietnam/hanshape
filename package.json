@@ -7,6 +7,7 @@
     "test": "node --test tests/*.test.js",
     "demo": "node demo/server.js",
     "benchmark:adaptive": "node scripts/benchmark-adaptive.js",
-    "benchmark:lookahead": "node scripts/benchmark-lookahead.js"
+    "benchmark:lookahead": "node scripts/benchmark-lookahead.js",
+    "benchmark:pairs": "node scripts/benchmark-pairs.js"
   }
 }
