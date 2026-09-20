@@ -28,9 +28,11 @@ export function observationToSemanticQuery(observation, value) {
     if (typeof value !== "boolean") return null;
 
     const region = observation.target;
-    return value
-      ? { regions: { [region]: { strokeTypes: [observation.path[0]] } } }
-      : null;
+    const positive = {
+      regions: { [region]: { strokeTypes: [observation.path[0]] } }
+    };
+
+    return value ? positive : { not: positive };
   }
 
   if (observation.kind === "relation") {
