@@ -43,11 +43,13 @@ test("negative stroke observation becomes a semantic NOT query", () => {
 test("relation observation becomes a relation query", () => {
   const query = observationToSemanticQuery({
     kind: "relation",
+    target: "C",
     relationKey: "relativeLength|hUpper|hLower"
   }, "shorter");
 
   assert.deepEqual(query, {
     relations: [{
+      target: "C",
       type: "relativeLength",
       a: "hUpper",
       b: "hLower",
