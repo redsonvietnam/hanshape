@@ -129,3 +129,10 @@ has(C.strokeTypes,dot)
 ```
 
 These compile into the same semantic AST used by numeric and relation-token input.
+
+Generic relation input is also available for relation concepts without a dedicated shorthand:
+
+```text
+rel(C.relation,parallelism)=true
+rel(C.relation,alignment)=aligned
+```
