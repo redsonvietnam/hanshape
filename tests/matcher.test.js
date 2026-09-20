@@ -47,7 +47,10 @@ test("大/太/犬", () => {
 test("明/林/朋/服", () => {
   assert.deepEqual(chars(matchSemantic(CHARACTER_MODEL, { form: "LR", regions: { L: { strokes: 4 }, R: { strokes: 4 } } })), ["明", "林", "朋", "服"]);
   assert.deepEqual(chars(matchSemantic(CHARACTER_MODEL, { form: "LR", regions: { L: { topology: { enclosure: true } }, R: { topology: { enclosure: false } } } })), ["明"]);
-  assert.deepEqual(chars(matchSemantic(CHARACTER_MODEL, { form: "LR", regions: { L: { topology: { enclosure: true } }, R: { topology: { enclosure: true } } } })), ["朋"]);
+  assert.deepEqual(chars(matchSemantic(CHARACTER_MODEL, { form: "LR", regions: {
+    L: { topology: { enclosure: false }, content: { strokes: 2 } },
+    R: { topology: { enclosure: false }, content: { strokes: 2 } }
+  } })), ["朋"]);
   assert.deepEqual(chars(matchSemantic(CHARACTER_MODEL, { form: "LR", regions: { L: { topology: { enclosure: false } }, R: { geometry: { curvature: "mixed" } } } })), ["服"]);
   assert.deepEqual(chars(matchSemantic(CHARACTER_MODEL, { form: "LR", regions: { L: { topology: { enclosure: false } }, R: { topology: { enclosure: false }, geometry: { symmetry: "vertical" } } } })), ["林"]);
 });
