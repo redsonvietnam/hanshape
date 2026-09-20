@@ -43,10 +43,13 @@ function identify(candidates, target, depth, policyCache) {
 }
 
 const sizes = [4];
+const MAX_SUBSETS = 512;
 const results = [];
 
 for (const size of sizes) {
-  const subsets = combinations(CHARACTER_MODEL, size);
+  const allSubsets = combinations(CHARACTER_MODEL, size);
+  const step = Math.max(1, Math.floor(allSubsets.length / MAX_SUBSETS));
+  const subsets = allSubsets.filter((_, index) => index % step === 0).slice(0, MAX_SUBSETS);
   let cases = 0;
   let failed1 = 0;
   let failed2 = 0;
@@ -95,7 +98,8 @@ for (const size of sizes) {
 
   results.push({
     size,
-    subsets: combinations(CHARACTER_MODEL, size).length,
+    allSubsets: allSubsets.length,
+    subsets: subsets.length,
     cases,
     avgDepth1: total1 / cases,
     avgDepth2: total2 / cases,
@@ -113,6 +117,6 @@ for (const size of sizes) {
 }
 
 console.log("");
-console.log("Exhaustive lookahead comparison (all 4-character subsets)");
+console.log("Lookahead comparison (deterministic sample of 4-character subsets)");
 console.log("==============================");
 console.table(results);
