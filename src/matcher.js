@@ -95,6 +95,7 @@ function matchRelations(char, relations = []) {
 }
 
 export function matchSemantic(characters, query) {
+  if (!query) return [];
   return characters.filter(char => {
     if (query.not && matchSemantic([char], query.not).length > 0) return false;
     if (query.form && char.form !== query.form) return false;
