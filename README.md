@@ -82,6 +82,8 @@ The demo lets you choose an adversarial candidate group, select a hidden target 
 
 The adaptive matcher is now paired with an exact target-specific observation-path solver. This measures the gap between the current greedy policy, the best path available in the current semantic question space, and the binary information lower bound.
 
+The next layer measures a separate **input expressiveness gap**: whether those semantic observations can actually be encoded by the current numeric grammar. See `docs/INPUT_EXPRESSIVENESS.md` and run `npm run benchmark:input-expressiveness`.
+
 Run the benchmark with:
 
 ```bash

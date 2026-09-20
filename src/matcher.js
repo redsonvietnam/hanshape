@@ -29,6 +29,16 @@ function evaluateFeature(char, refinement) {
     return source.strokeTypes?.includes(query.contains) ?? false;
   }
 
+  if (
+    query.path === "relations.parallelism" &&
+    query.equals === true
+  ) {
+    return source.relations?.some(relation =>
+      relation.type === "parallelism" &&
+      relation.value === true
+    ) ?? false;
+  }
+
   const value = query.path.split(".").reduce((v, key) => v?.[key], source);
 
   if (query.operator === "gt") return Number(value) > query.value;
