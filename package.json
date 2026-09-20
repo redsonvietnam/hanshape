@@ -15,8 +15,9 @@
     "benchmark:input-expressiveness": "node scripts/benchmark-input-expressiveness.js",
     "benchmark:multivalue": "node scripts/benchmark-multivalue.js",
     "benchmark:decision-tree": "node scripts/benchmark-decision-tree.js",
-    "check:demo": "node --check demo/demo.js && node --check demo/query-lab.js && node --check demo/server.js",
-    "audit:language": "node scripts/audit-language-capability.js"
+    "check:demo": "node --check demo/demo.js && node --check demo/query-lab.js && node --check demo/study-lab.js && node --check demo/server.js",
+    "audit:language": "node scripts/audit-language-capability.js",
+    "benchmark:human-effort": "node scripts/benchmark-human-effort.js"
   },
   "description": "HanShape semantic visual query language research prototype"
 }

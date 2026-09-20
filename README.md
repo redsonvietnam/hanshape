@@ -99,6 +99,14 @@ See `docs/OBSERVATION_PATHS.md` for interpretation and research rules.
 
 The adaptive demo remains a laboratory/debugging tool rather than the final HanShape interaction model.
 
+## Human Effort Study
+
+The repository includes a local-only human-effort study surface at `/demo/study-lab.html`.
+
+It measures actual task latency and observation choices instead of treating the heuristic recognition weights as empirical facts. Exported sessions are JSON files created only when the user explicitly requests an export.
+
+See `docs/HUMAN_EFFORT.md`.
+
 ## Status
 
 Research prototype. The next bottlenecks are corpus coverage, input expressiveness, and human observation cost—not deeper lookahead by itself.
